@@ -1,0 +1,6 @@
+module Pods_Strength_Progress_Tracker {
+  umbrella header "Pods-Strength Progress Tracker-umbrella.h"
+
+  export *
+  module * { export * }
+}
