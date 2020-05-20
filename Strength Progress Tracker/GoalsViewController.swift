@@ -52,7 +52,7 @@ class GoalsViewController: UIViewController {
 //        self.lineChart.xAxis.valueFormatter = DefaultAxisValueFormatter { (value, axis) -> String in return chartXVals[Int(value)] }
 
         
-        print(dbManager.getRecentActivity(exercise: "Bench Press"))
+        print(dbManager.getRecentActivity(exercise: "Bench Press", timeFrame: "all"))
     }
     
 

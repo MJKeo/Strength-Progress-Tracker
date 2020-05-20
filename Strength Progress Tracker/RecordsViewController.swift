@@ -60,8 +60,14 @@ class RecordsViewController: UIViewController, UITableViewDelegate, UITableViewD
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell : RecordTableViewCell = recordsTable.dequeueReusableCell(withIdentifier: "recordCell", for: indexPath) as! RecordTableViewCell
         
-        cell.exerciseIcon.image = UIImage(named: "snatch")
-        cell.exerciseTitle.text = (recordsList[indexPath.row][0] as? String)!
+        let exerciseName = (recordsList[indexPath.row][0] as? String)!
+        cell.exerciseTitle.text = exerciseName
+        if (self.exerciseList.contains([exerciseName, "bodyweight"]) || self.exerciseList.contains([exerciseName, "weights"])) {
+            cell.exerciseIcon.image = UIImage(named: exerciseName)
+        } else {
+            cell.exerciseIcon.image = UIImage(named: "custom")
+        }
+//        cell.exerciseIcon.image = UIImage(named: "snatch")
         var bestORM = recordsList[indexPath.row][1] as! Double
         let bestORMInt = floor(bestORM * 100)
         bestORM = Double(bestORMInt) / 100.0

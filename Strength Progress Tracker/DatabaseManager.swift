@@ -43,6 +43,7 @@ class DatabaseManager {
         let createActivityRecordsTableQuery = "CREATE TABLE IF NOT EXISTS UserActivity (id INTEGER PRIMARY KEY AUTOINCREMENT, exercise TEXT, time_recorded DATE, reps INTEGER, weight Text, orm FLOAT)"
         let createCustomExercisesTable = "CREATE TABLE IF NOT EXISTS CustomExerciseList (id INTEGER PRIMARY KEY AUTOINCREMENT, exercise TEXT, category TEXT)"
         let createRecordsTable = "CREATE TABLE IF NOT EXISTS UserRecords (id INTEGER PRIMARY KEY AUTOINCREMENT, exercise TEXT, record DOUBLE)"
+        let createGoalsTable = "CREATE TABLE IF NOT EXISTS UserGoals (id INTEGER PRIMARY KEY AUTOINCREMENT, exercise TEXT, goal DOUBLE)"
         print(fileUrl.path)
 
         if sqlite3_open(fileUrl.path, &db) != SQLITE_OK {
@@ -64,6 +65,7 @@ class DatabaseManager {
         sqlite3_exec(userDb, createActivityRecordsTableQuery, nil, nil, nil)
         sqlite3_exec(userDb, createCustomExercisesTable, nil, nil, nil)
         sqlite3_exec(userDb, createRecordsTable, nil, nil, nil)
+        sqlite3_exec(userDb, createGoalsTable, nil, nil, nil)
     }
     
     func populateDatabase() {
@@ -1710,9 +1712,18 @@ class DatabaseManager {
         return exercises
     }
     
-    func getRecentActivity(exercise: String) -> [[String]] {
+    func getRecentActivity(exercise: String, timeFrame: String) -> [[String]] {
         var readStatement: OpaquePointer?
-        let selectQuery = "SELECT * FROM UserActivity WHERE exercise = '" + exercise + "' ORDER BY time_recorded"
+        var selectQuery = "SELECT * FROM UserActivity WHERE exercise = '" + exercise + "'"
+        
+        // do time frame filtering
+        if (timeFrame != "all") {
+            selectQuery += " AND (time_recorded BETWEEN date('now','" + timeFrame + "') AND date()) ORDER BY time_recorded"
+        } else {
+            selectQuery += " ORDER BY time_recorded"
+        }
+        print(selectQuery)
+        
         var toBeReturned: [[String]] = []
         
         if sqlite3_prepare(userDb, selectQuery, -1, &readStatement, nil) == SQLITE_OK {
@@ -1723,7 +1734,7 @@ class DatabaseManager {
                 let reps = sqlite3_column_int(readStatement, 3)
                 guard let weight = sqlite3_column_text(readStatement, 4) else { return [] }
                 let orm = sqlite3_column_double(readStatement, 5)
-                let entry = [String(cString: timeRecorded), String(orm)]
+                let entry = [String(cString: timeRecorded), String(orm), String(rowId)]
                 toBeReturned.append(entry)
             }
         }
@@ -1795,4 +1806,209 @@ class DatabaseManager {
         return toBeReturned
     }
     
+    func addToGoals(exercise: String, value: Double) {
+        var statement: OpaquePointer?
+        let addQuery = "INSERT INTO UserGoals (exercise, goal) VALUES ('" + exercise + "'," + String(value) + ")"
+        print(addQuery)
+        
+        if sqlite3_prepare(userDb, addQuery, -1, &statement, nil) != SQLITE_OK {
+            print("error binding query")
+            return
+        }
+        
+        if sqlite3_step(statement) == SQLITE_DONE {
+            print("saved user goal")
+        }
+    }
+    
+    func updateGoal(exercise: String, value: Double) {
+        var updateStatement: OpaquePointer?
+        let updateQuery = "UPDATE UserGoals SET goal = " + String(value) + " WHERE exercise = '" + exercise + "'"
+         
+        print(updateQuery)
+        
+        if sqlite3_prepare(userDb, updateQuery, -1, &updateStatement, nil) != SQLITE_OK {
+            print("error binding query")
+            return
+        }
+        
+        if sqlite3_step(updateStatement) == SQLITE_DONE {
+            print("updated user goal")
+        }
+    }
+    
+    func getGoal(exercise: String) -> Double {
+        var readStatement: OpaquePointer?
+        let selectQuery = "SELECT goal FROM UserGoals WHERE exercise = '" + exercise + "'"
+        var toBeReturned = -1.0
+        
+        if sqlite3_prepare(userDb, selectQuery, -1, &readStatement, nil) == SQLITE_OK {
+            while sqlite3_step(readStatement) == SQLITE_ROW {
+                let amount = sqlite3_column_double(readStatement, 0)
+                print(amount)
+                toBeReturned = amount
+            }
+        }
+        
+        return toBeReturned
+    }
+    
+    func getGoalsList() -> [[Any]] {
+        var readStatement: OpaquePointer?
+        let selectQuery = "SELECT * FROM UserGoals order by exercise"
+        var toBeReturned: [[Any]] = []
+        
+        if sqlite3_prepare(userDb, selectQuery, -1, &readStatement, nil) == SQLITE_OK {
+            while sqlite3_step(readStatement) == SQLITE_ROW {
+                let index = sqlite3_column_int(readStatement, 0)
+                guard let exercise = sqlite3_column_text(readStatement, 1) else { return [] }
+                let record = sqlite3_column_double(readStatement, 2)
+                toBeReturned.append([String(cString: exercise), record])
+            }
+        }
+        
+        return toBeReturned
+    }
+    
+    func getMostRecentExercise() -> String {
+        var readStatement: OpaquePointer?
+        let selectQuery = "SELECT * FROM UserActivity ORDER BY id desc"
+        print(selectQuery)
+        
+        if sqlite3_prepare(userDb, selectQuery, -1, &readStatement, nil) == SQLITE_OK {
+            while sqlite3_step(readStatement) == SQLITE_ROW {
+                guard let exercise = sqlite3_column_text(readStatement, 1) else { return "" }
+                return String(cString: exercise)
+            }
+        }
+        
+        return ""
+    }
+    
+    func deleteActivity(index: String) {
+        var statement: OpaquePointer?
+        let deleteQuery = "DELETE FROM UserActivity WHERE id = " + index
+        print(deleteQuery)
+        
+        if sqlite3_prepare(userDb, deleteQuery, -1, &statement, nil) != SQLITE_OK {
+            print("error binding query")
+            return
+        }
+        
+        if sqlite3_step(statement) == SQLITE_DONE {
+            print("deleted activity")
+        }
+    }
+    
+    func updateExerciseType(exercise: String, newType: String) {
+        var statement: OpaquePointer?
+        let updateQuery = "UPDATE CustomExerciseList SET category = '" + newType + "' WHERE exercise = '" + exercise + "'"
+        print(updateQuery)
+        
+        if sqlite3_prepare(userDb, updateQuery, -1, &statement, nil) != SQLITE_OK {
+            print("error binding query")
+            return
+        }
+        
+        if sqlite3_step(statement) == SQLITE_DONE {
+            print("updated exercise type")
+        }
+    }
+    
+    func deleteExercise(exercise: String) {
+        // 1. recorded activities
+        // 2. personal bests
+        // 3. goals
+        // 4. exerciseList
+        var statement: OpaquePointer?
+        let firstQuery = "DELETE FROM UserActivity WHERE exercise = '" + exercise + "'"
+        let secondQuery = "DELETE FROM CustomExerciseList WHERE exercise = '" + exercise + "'"
+        let thirdQuery = "DELETE FROM UserRecords WHERE exercise = '" + exercise + "'"
+        let fourthQuery = "DELETE FROM UserGoals WHERE exercise = '" + exercise + "'"
+        
+        if sqlite3_prepare(userDb, firstQuery, -1, &statement, nil) != SQLITE_OK {
+            print("error binding query")
+            return
+        }
+        
+        if sqlite3_step(statement) == SQLITE_DONE {
+            print("deleted from activities")
+        }
+        
+        if sqlite3_prepare(userDb, secondQuery, -1, &statement, nil) != SQLITE_OK {
+            print("error")
+            return
+        }
+        
+        if sqlite3_step(statement) == SQLITE_DONE {
+            print("deleted from list")
+        }
+        
+        if sqlite3_prepare(userDb, thirdQuery, -1, &statement, nil) != SQLITE_OK {
+            print("error binding query")
+            return
+        }
+        
+        if sqlite3_step(statement) == SQLITE_DONE {
+            print("deleted from records")
+        }
+        
+        if sqlite3_prepare(userDb, fourthQuery, -1, &statement, nil) != SQLITE_OK {
+            print("error binding query")
+            return
+        }
+        
+        if sqlite3_step(statement) == SQLITE_DONE {
+            print("deleted from goals")
+        }
+    }
+    
+    func updateExerciseName(oldName: String, newName: String) {
+        //let updateQuery = "UPDATE UserRecords SET record = " + String(value) + " WHERE exercise = '" + exercise + "'"
+        // 1. recorded activities
+        // 2. personal bests
+        // 3. goals
+        // 4. exerciseList
+        var statement: OpaquePointer?
+        let firstQuery = "UPDATE UserActivity SET exercise = '" + newName + "' WHERE exercise = '" + oldName + "'"
+        let secondQuery = "UPDATE CustomExerciseList SET exercise = '" + newName + "' WHERE exercise = '" + oldName + "'"
+        let thirdQuery = "UPDATE UserRecords SET exercise = '" + newName + "' WHERE exercise = '" + oldName + "'"
+        let fourthQuery = "UPDATE UserGoals SET exercise = '" + newName + "' WHERE exercise = '" + oldName + "'"
+        
+        if sqlite3_prepare(userDb, firstQuery, -1, &statement, nil) != SQLITE_OK {
+            print("error binding query")
+            return
+        }
+        
+        if sqlite3_step(statement) == SQLITE_DONE {
+            print("updated in activities")
+        }
+        
+        if sqlite3_prepare(userDb, secondQuery, -1, &statement, nil) != SQLITE_OK {
+            print("error")
+            return
+        }
+        
+        if sqlite3_step(statement) == SQLITE_DONE {
+            print("updated in list")
+        }
+        
+        if sqlite3_prepare(userDb, thirdQuery, -1, &statement, nil) != SQLITE_OK {
+            print("error binding query")
+            return
+        }
+        
+        if sqlite3_step(statement) == SQLITE_DONE {
+            print("updated in records")
+        }
+        
+        if sqlite3_prepare(userDb, fourthQuery, -1, &statement, nil) != SQLITE_OK {
+            print("error binding query")
+            return
+        }
+        
+        if sqlite3_step(statement) == SQLITE_DONE {
+            print("updated in goals")
+        }
+    }
 }

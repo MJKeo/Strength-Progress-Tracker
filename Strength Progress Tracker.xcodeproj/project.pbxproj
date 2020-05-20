@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4900891424731CF100A905E0 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4900891324731CF100A905E0 /* SettingsViewController.swift */; };
+		490EF52B24743F5100724BFF /* RecentActivityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490EF52A24743F5100724BFF /* RecentActivityViewController.swift */; };
+		490EF52D24743F9500724BFF /* RecentActivityTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490EF52C24743F9500724BFF /* RecentActivityTableViewCell.swift */; };
+		490EF52F2474615F00724BFF /* EditExerciseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 490EF52E2474615F00724BFF /* EditExerciseViewController.swift */; };
 		492263D224607543001093D7 /* RecordsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492263D124607543001093D7 /* RecordsViewController.swift */; };
 		492263D424607AC4001093D7 /* RecordTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492263D324607AC4001093D7 /* RecordTableViewCell.swift */; };
 		4928F9D1244779F400633D82 /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4928F9D0244779F400633D82 /* DatabaseManager.swift */; };
@@ -37,6 +41,10 @@
 
 /* Begin PBXFileReference section */
 		00F1BCA91B11FF03AF458390 /* Pods-Strength Progress Tracker.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strength Progress Tracker.debug.xcconfig"; path = "Target Support Files/Pods-Strength Progress Tracker/Pods-Strength Progress Tracker.debug.xcconfig"; sourceTree = "<group>"; };
+		4900891324731CF100A905E0 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		490EF52A24743F5100724BFF /* RecentActivityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentActivityViewController.swift; sourceTree = "<group>"; };
+		490EF52C24743F9500724BFF /* RecentActivityTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentActivityTableViewCell.swift; sourceTree = "<group>"; };
+		490EF52E2474615F00724BFF /* EditExerciseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditExerciseViewController.swift; sourceTree = "<group>"; };
 		492263D124607543001093D7 /* RecordsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordsViewController.swift; sourceTree = "<group>"; };
 		492263D324607AC4001093D7 /* RecordTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordTableViewCell.swift; sourceTree = "<group>"; };
 		4928F9D0244779F400633D82 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
@@ -115,10 +123,14 @@
 				4989E4452453611F00CBE4E6 /* AddExerciseCollectionViewCell.swift */,
 				4989E4472453674100CBE4E6 /* AddExerciseViewController.swift */,
 				4972BF692443DD16009261B6 /* HomePageViewController.swift */,
+				4900891324731CF100A905E0 /* SettingsViewController.swift */,
 				495290A824566A99005BE0D4 /* ExerciseBreakdownViewController.swift */,
 				494D6AC52463304E000301AF /* BreakdownORMTableViewCell.swift */,
 				494D6AC724633D50000301AF /* BreakdownGoalTableViewCell.swift */,
 				494D6AC924633D66000301AF /* BreakdownStrengthLevelTableViewCell.swift */,
+				490EF52E2474615F00724BFF /* EditExerciseViewController.swift */,
+				490EF52A24743F5100724BFF /* RecentActivityViewController.swift */,
+				490EF52C24743F9500724BFF /* RecentActivityTableViewCell.swift */,
 				4938D8A2244B8E6B00DCA81B /* RecordActivityViewController.swift */,
 				492263D124607543001093D7 /* RecordsViewController.swift */,
 				492263D324607AC4001093D7 /* RecordTableViewCell.swift */,
@@ -250,6 +262,7 @@
 				4972BF682443DBF3009261B6 /* SetupProfileViewController.swift in Sources */,
 				4972BF562443DAA1009261B6 /* ViewController.swift in Sources */,
 				49BA71EE2449197000411EA1 /* GenericPickerViewController.swift in Sources */,
+				490EF52F2474615F00724BFF /* EditExerciseViewController.swift in Sources */,
 				49C2BB11245B355900547BE6 /* GoalsViewController.swift in Sources */,
 				4972BF522443DAA1009261B6 /* AppDelegate.swift in Sources */,
 				4972BF6C24442210009261B6 /* SetupProfileInputViewController.swift in Sources */,
@@ -260,6 +273,8 @@
 				4972BF542443DAA1009261B6 /* SceneDelegate.swift in Sources */,
 				4938D8A3244B8E6B00DCA81B /* RecordActivityViewController.swift in Sources */,
 				492263D224607543001093D7 /* RecordsViewController.swift in Sources */,
+				490EF52B24743F5100724BFF /* RecentActivityViewController.swift in Sources */,
+				4900891424731CF100A905E0 /* SettingsViewController.swift in Sources */,
 				4928F9D1244779F400633D82 /* DatabaseManager.swift in Sources */,
 				4989E4482453674100CBE4E6 /* AddExerciseViewController.swift in Sources */,
 				4989E4462453611F00CBE4E6 /* AddExerciseCollectionViewCell.swift in Sources */,
@@ -268,6 +283,7 @@
 				495290A924566A99005BE0D4 /* ExerciseBreakdownViewController.swift in Sources */,
 				49BA2610244A4030004B16B3 /* SetupProfileSelectExerciseViewController.swift in Sources */,
 				496FDA362448BE2800E715E6 /* ORMViewController.swift in Sources */,
+				490EF52D24743F9500724BFF /* RecentActivityTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

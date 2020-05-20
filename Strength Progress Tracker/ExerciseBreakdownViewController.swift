@@ -9,13 +9,14 @@
 import UIKit
 import Charts
 
-class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIPickerViewDataSource, UIPickerViewDelegate {
+class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIPickerViewDataSource, UIPickerViewDelegate, ChartViewDelegate {
     
     // title
     @IBOutlet weak var titleLabel: UILabel!
     
     // graph
     @IBOutlet weak var progressChart: LineChartView!
+    @IBOutlet weak var activityDetailLabel: UILabel!
     
     // record activity button
     @IBOutlet weak var recordActivityButton: UIButton!
@@ -39,8 +40,6 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
     @IBOutlet weak var pickerView: UIView!
     @IBOutlet weak var dataPicker: UIPickerView!
     
-    
-    
     // variables
     var exercise: String = ""
     var activity: [[String]] = []
@@ -48,6 +47,11 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
     var personalBest = 0.0
     var goal = 315
     var viewingUnits = "lbs"
+    var timeFrame = "-6 days"
+    var startTime: Date = Date()
+    var endTime: Date = Date()
+    var axisDates: [String] = []
+    
     
     var options: [String] = []
     var repsList: [String] = []
@@ -61,6 +65,7 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
     
     var exerciseList: [[String]] = []
     var userExercises: [String] = []
+    var standards: [Double] = []
     
     let redTextAttrs = [
     NSAttributedString.Key.foregroundColor : UIColor(red: (207/255.0), green: (41/255.0), blue: (29/255.0), alpha: 1),
@@ -75,6 +80,7 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         super.viewDidLoad()
         
         self.exercise = UserDefaults.standard.object(forKey: "Selected Exercise") as! String
+        print("bruhbruh")
         self.titleLabel.text = exercise
         self.personalBest = dbManager.getRecord(exercise: self.exercise)
         if (self.personalBest < 0) {
@@ -82,6 +88,9 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         }
         
         doStyling()
+        
+        // get my standards
+        getStandards()
         
         // prepare table view to get data from this file
         self.myTableView.delegate = self
@@ -91,20 +100,31 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         self.dataPicker.delegate = self
         self.dataPicker.dataSource = self
         
+        // delegate for my graph
+        self.progressChart.delegate = self
+        
         // allows tap on screen to get rid of popups and pickers
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(sender:)))
         self.view.addGestureRecognizer(tap)
         
         // populate graph
         updateGraph()
+        
+        // refresh everything
+        refresh()
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        
+    }
+    
+    func refresh() {
         self.changeTimeFrameOneWeek(self)
         
         self.setupPickerLists()
         
         self.recordBottomConstraint.constant = -1 * self.view.frame.height / 2
+        
         
         // get exercise list
         exerciseList = dbManager.getExercises()
@@ -112,16 +132,27 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         for item in userExercises {
             exerciseList.append(item)
         }
-        print("aaaah")
-        print(exerciseList)
         
         if (exerciseList.firstIndex(of: [self.exercise,"bodyweight"]) != nil) {
             let userWeight = UserDefaults.standard.object(forKey: "User Weight")
-            self.goal = 5
             self.weightButton.setTitle(userWeight as? String, for: .normal)
             self.weightButton.setTitleColor(UIColor.gray, for: .normal)
             self.weightButton.isEnabled = false
         }
+        // do goal thing
+        self.goal = Int(dbManager.getGoal(exercise: self.exercise))
+        if (self.goal == -1) {
+            if (self.weightButton.isEnabled) {
+                self.goal = 315
+                dbManager.addToGoals(exercise: self.exercise, value: 315.0)
+            } else {
+                self.goal = 5
+                
+            }
+        }
+        
+        // setup my strength standards
+        getStandards()
         
         // make sure my numbers are accurate
         refreshData()
@@ -131,52 +162,148 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         MAIN FUNCTIONALITY
      */
     func updateGraph() {
-        self.activity = dbManager.getRecentActivity(exercise: self.exercise)
+        self.activity = dbManager.getRecentActivity(exercise: self.exercise, timeFrame: self.timeFrame)
         print(self.activity)
         
         var myDataEntries: [ChartDataEntry] = []
         var dataDates: [String] = []
         var myGoalEntries: [ChartDataEntry] = []
         
+        var standardsSets: [[ChartDataEntry]] = [[],[],[],[],[]]
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MM/dd"
+        let yearFormatter = DateFormatter()
+        yearFormatter.dateFormat = "MM/dd/yyyy"
+        
+        let endTimeString = yearFormatter.string(from: Calendar.current.date(byAdding: .day, value: 1, to: self.endTime)!)
+        
+        var tiem = self.startTime
+        var numDates = 0
+        while(yearFormatter.string(from: tiem) != endTimeString) {
+//            print(formatter.string(from: tiem))
+            tiem = Calendar.current.date(byAdding: .day, value: 1, to: tiem)!
+            numDates += 1
+        }
+        
         
         var index = 0
-        let validIndices = [0, Int(round(Double(activity.count) / 3)), 2 * Int(round(Double(activity.count) / 3)), activity.count - 1]
-        while (index < activity.count) {
-            // entry = [date recorded, ORM]
-            let entry = activity[index]
-            let weight = entry[1]
-            let splitWeight = weight.split(separator: ".")
-            let wholeWeight = Int(splitWeight[0])!
-            let decimalWeight = Int(splitWeight[1])!
-            let overallWeight = Double(wholeWeight) + (Double(decimalWeight) / 100)
-            let dataPoint = ChartDataEntry(x: Double(index), y: overallWeight)
-            myDataEntries.append(dataPoint)
-            
-            let goalPoint = ChartDataEntry(x: Double(index), y: Double(self.goal))
-            myGoalEntries.append(goalPoint)
-            
-            // do date formatting
-            let splitDate = entry[0].split(separator: "-")
-            let newString = splitDate[1] + "/" + splitDate[2]
-            if (activity.count <= 6 || validIndices.contains(index)) {
-               dataDates.append(String(newString))
+        var entryIndex = 0
+        var time = self.startTime
+//        print(endTimeString)
+        while (yearFormatter.string(from: time) != endTimeString) {
+            // add date
+            if (!dataDates.contains(formatter.string(from: time))) {
+                dataDates.append(formatter.string(from: time))
+            }
+            // add goals and standards
+            if (UserDefaults.standard.string(forKey: "Display Units") == "kgs" && self.weightButton.isEnabled) {
+                UserDefaults.standard.set("kgs", forKey: "Suffix")
+                if (self.goalUnit == "kgs") {
+                    let goalPoint = ChartDataEntry(x: Double(index), y: Double(self.goal))
+                    myGoalEntries.append(goalPoint)
+                } else {
+                    var num = Double(self.goal) / 2.20462
+                    num = round(num * 10) / 10.0
+                    let goalPoint = ChartDataEntry(x: Double(index), y: num)
+                    myGoalEntries.append(goalPoint)
+                }
             } else {
-                dataDates.append("")
+                if (self.goalUnit == "kgs" && self.weightButton.isEnabled) {
+                    UserDefaults.standard.set("lbs", forKey: "Suffix")
+                    var num = Double(self.goal) * 2.20462
+                    num = round(num * 10) / 10.0
+                    let goalPoint = ChartDataEntry(x: Double(index), y: num)
+                    myGoalEntries.append(goalPoint)
+                } else {
+                    if (self.weightButton.isEnabled) {
+                        UserDefaults.standard.set("lbs", forKey: "Suffix")
+                    }
+                    let goalPoint = ChartDataEntry(x: Double(index), y: Double(self.goal))
+                    myGoalEntries.append(goalPoint)
+                }
+            }
+            
+            // EZPZ
+            var i = 0
+            while (i < self.standards.count) {
+                var rounded = round(self.standards[i] * 10) / 10.0
+                if (UserDefaults.standard.string(forKey: "Display Units") == "kgs" && self.weightButton.isEnabled) {
+                    rounded /= 2.20462
+                    rounded = round(rounded * 10) / 10.0
+                }
+                let point = ChartDataEntry(x: Double(index), y: rounded)
+                standardsSets[i].append(point)
+                i += 1
+            }
+            // determine if we add this data
+            if (entryIndex < activity.count) {
+                let entry = activity[entryIndex]
+                let splitDates = entry[0].split(separator: "-")
+                let newStrings = splitDates[1] + "/" + splitDates[2] + "/" + splitDates[0]
+                if (newStrings == yearFormatter.string(from: time)) {
+                    // entry = [date recorded, ORM]
+                    let weight = entry[1]
+                    let splitWeight = weight.split(separator: ".")
+                    let wholeWeight = Int(splitWeight[0])!
+                    let decimalWeight = Int(splitWeight[1])!
+                    var overallWeight = Double(wholeWeight) + (Double(decimalWeight) / 100)
+                    if (UserDefaults.standard.string(forKey: "Display Units") == "kgs" && self.weightButton.isEnabled) {
+                        overallWeight /= 2.20462
+                        overallWeight = round(overallWeight * 10) / 10.0
+                    }
+                    
+                    let dataPoint = ChartDataEntry(x: Double(index), y: overallWeight)
+                    myDataEntries.append(dataPoint)
+                    entryIndex += 1
+                    index -= 1
+                } else {
+                    time = Calendar.current.date(byAdding: .day, value: 1, to: time)!
+                }
+            } else {
+                time = Calendar.current.date(byAdding: .day, value: 1, to: time)!
             }
             
             index += 1
         }
         
+//        print(dataDates)
+        
         let myDataSet = LineChartDataSet(entries: myDataEntries, label: "One Rep Maxes")
         myDataSet.colors = [UIColor(red: (237/255.0), green: (17/255.0), blue: (51/255.0), alpha: 1)]
         myDataSet.circleColors = [UIColor(red: (162/255.0), green: (0/255.0), blue: (34/255.0), alpha: 1)]
+        myDataSet.drawValuesEnabled = false
+        if (numDates >= 8) {
+            myDataSet.drawCirclesEnabled = false
+        }
         let myData = LineChartData(dataSet: myDataSet)
         let goalDataSet = LineChartDataSet(entries: myGoalEntries, label: "Goal")
-        goalDataSet.colors = [UIColor(red: (23/255.0), green: (172/255.0), blue: (3/255.0), alpha: 1)]
+        let beginnerDataSet = LineChartDataSet(entries: standardsSets[0], label: "Beginner")
+        let noviceDataSet = LineChartDataSet(entries: standardsSets[1], label: "Novice")
+        let intermediateDataSet = LineChartDataSet(entries: standardsSets[2], label: "Intermediate")
+        let advancedDataSet = LineChartDataSet(entries: standardsSets[3], label: "Advanced")
+        let eliteDataSet = LineChartDataSet(entries: standardsSets[4], label: "Elite")
+        
+        // setup and add goal set
+        goalDataSet.colors = [UIColor.black]
         goalDataSet.drawCirclesEnabled = false
         goalDataSet.drawValuesEnabled = false
-        goalDataSet.lineWidth = 2
+        goalDataSet.lineWidth = 3
         myData.addDataSet(goalDataSet)
+
+        // add all other sets
+        let sets = [beginnerDataSet, noviceDataSet, intermediateDataSet, advancedDataSet, eliteDataSet]
+        let colors = [UIColor(red: (135/255.0), green: (32/255.0), blue: (239/255.0), alpha: 1), UIColor(red: (74/255.0), green: (127/255.0), blue: (245/255.0), alpha: 1), UIColor(red: (23/255.0), green: (172/255.0), blue: (3/255.0), alpha: 1), UIColor(red: (240.0/255.0), green: (166/255.0), blue: (0/255.0), alpha: 1), UIColor(red: (237/255.0), green: (17/255.0), blue: (51/255.0), alpha: 1)]
+        index = 0
+        while (index < sets.count) {
+            sets[index].colors = [colors[index]]
+            sets[index].drawCirclesEnabled = false
+            sets[index].drawValuesEnabled = false
+            sets[index].lineWidth = 2
+            myData.addDataSet(sets[index])
+            index += 1
+        }
+
         self.progressChart.xAxis.valueFormatter = DefaultAxisValueFormatter { (value, axis) -> String in return "l" }
         self.progressChart.data = myData
         
@@ -190,26 +317,100 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         self.progressChart.xAxis.spaceMax = 0.2
         self.progressChart.xAxis.granularityEnabled = true
         self.progressChart.xAxis.granularity = 1
+        self.progressChart.doubleTapToZoomEnabled = false
+        self.progressChart.pinchZoomEnabled = false
         
-        self.progressChart.xAxis.labelCount = dataDates.count
-        self.progressChart.xAxis.valueFormatter = DefaultAxisValueFormatter { (value, axis) -> String in return dataDates[Int(value)] }
+        if (numDates > 7) {
+            self.progressChart.xAxis.labelCount = 8
+        } else {
+            self.progressChart.xAxis.labelCount = numDates
+        }
+        
+        self.axisDates = dataDates
+        
+        self.progressChart.xAxis.valueFormatter = DefaultAxisValueFormatter { (value, axis) -> String in return self.labelHandler(index: Int(value), dates: dataDates) }
     }
     
     func refreshData() {
         self.updateGraph()
         self.personalBest = dbManager.getRecord(exercise: self.exercise)
-        print("best:")
-        print(self.personalBest)
+
         if (self.personalBest < 0) {
             self.personalBest = 0
         }
         self.myTableView.reloadData()
-        print(dbManager.getRecordsList())
+//        print(dbManager.getRecordsList())
+    }
+    
+    func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {
+        print(highlight.dataSetIndex)
+        var description = ""
+        let units = UserDefaults.standard.string(forKey: "Display Units")!
+        if (highlight.dataSetIndex == 0) { // USER DATA SET
+            description = "Date: " + self.axisDates[Int(entry.x)] + "  ORM: "
+            if (self.weightButton.isEnabled) {
+                description += String(entry.y) + " " + units
+            } else {
+                description += String(Int(entry.y)) + " reps"
+            }
+        } else if (highlight.dataSetIndex == 1) { // GOAL SET
+            if (self.weightButton.isEnabled) {
+                description = "My Goal: " + String(entry.y) + " " + units
+            } else {
+                description += "My Goal: " + String(Int(entry.y)) + " reps"
+            }
+        } else { // STANDARDS
+            let standardNames = ["Beginner", "Novice", "Intermediate", "Advanced", "Elite"]
+            if (self.weightButton.isEnabled) {
+                description = standardNames[highlight.dataSetIndex - 2] + " Standard: " + String(entry.y) + " " + units
+            } else {
+                description += standardNames[highlight.dataSetIndex - 2] + " Standard: " + String(Int(entry.y)) + " reps"
+            }
+        }
+        
+        self.activityDetailLabel.text = description
     }
     
     /*
         HELPER METHODS
      */
+    
+    func labelHandler(index: Int, dates: [String]) -> String {
+        return dates[index]
+    }
+    
+    
+    @IBAction func goToSettings(_ sender: Any) {
+        // get extra info on my exercise
+        if (self.weightButton.isEnabled) {
+            UserDefaults.standard.set("weights", forKey: "Exercise Type")
+        } else {
+            UserDefaults.standard.set("bodyweight", forKey: "Exercise Type")
+        }
+        let userExercises = dbManager.getUserExercises()
+        if (userExercises.contains([self.exercise, "bodyweight"]) || userExercises.contains([self.exercise, "weightlifting"])) {
+            UserDefaults.standard.set("custom", forKey: "Exercise Category")
+        } else {
+            UserDefaults.standard.set("regular", forKey: "Exercise Category")
+        }
+        
+        let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
+        let setupViewController = storyBoard.instantiateViewController(withIdentifier: "editExercise")
+        self.present(setupViewController, animated:true, completion:nil)
+    }
+    
+    func getStandards() {
+        let userWeightString = UserDefaults.standard.object(forKey: "User Weight") as! String
+        print(userWeightString)
+        var userWeight = Double(userWeightString.split(separator: " ")[0])!
+        if (userWeightString.split(separator: " ")[1] == "kgs") {
+            userWeight *= 2.20462
+        }
+//        print(userWeight)
+        let userGender = UserDefaults.standard.string(forKey: "User Gender")!
+        let userAge = UserDefaults.standard.integer(forKey: "User Age")
+        self.standards = dbManager.getStrengthStandards(exercise: self.exercise, weight: Int(userWeight), gender: userGender, age: userAge)
+    }
     
     @objc func handleTap(sender: UITapGestureRecognizer) {
         self.hideRecordActivity()
@@ -218,6 +419,7 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
     }
     
     @IBAction func changeTimeFrameOneWeek(_ sender: Any) {
+        // update button looks
         var title = NSMutableAttributedString(string: "1 Week", attributes: self.redTextAttrs)
         self.timeFrameButtons[0].setAttributedTitle(title, for: .normal)
         title = NSMutableAttributedString(string: "1 Month", attributes: self.blackTextAttrs)
@@ -226,9 +428,16 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         self.timeFrameButtons[2].setAttributedTitle(title, for: .normal)
         title = NSMutableAttributedString(string: "1 Year", attributes: self.blackTextAttrs)
         self.timeFrameButtons[3].setAttributedTitle(title, for: .normal)
+        // modify time frame
+        self.timeFrame = "-6 days"
+        self.startTime = Calendar.current.date(byAdding: .day, value: -6, to: Date())!
+        self.endTime = Date()
+        // update graph
+        self.updateGraph()
     }
     
     @IBAction func changeTimeFrameOneMonth(_ sender: Any) {
+        // update button looks
         var title = NSMutableAttributedString(string: "1 Week", attributes: self.blackTextAttrs)
         self.timeFrameButtons[0].setAttributedTitle(title, for: .normal)
         title = NSMutableAttributedString(string: "1 Month", attributes: self.redTextAttrs)
@@ -237,9 +446,16 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         self.timeFrameButtons[2].setAttributedTitle(title, for: .normal)
         title = NSMutableAttributedString(string: "1 Year", attributes: self.blackTextAttrs)
         self.timeFrameButtons[3].setAttributedTitle(title, for: .normal)
+        // modify time frame
+        self.timeFrame = "-1 month"
+        self.startTime = Calendar.current.date(byAdding: .month, value: -1, to: Date())!
+        self.endTime = Date()
+        // update graph
+        self.updateGraph()
     }
     
     @IBAction func changeTimeFramSixMonth(_ sender: Any) {
+        // update button looks
         var title = NSMutableAttributedString(string: "1 Week", attributes: self.blackTextAttrs)
         self.timeFrameButtons[0].setAttributedTitle(title, for: .normal)
         title = NSMutableAttributedString(string: "1 Month", attributes: self.blackTextAttrs)
@@ -248,9 +464,16 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         self.timeFrameButtons[2].setAttributedTitle(title, for: .normal)
         title = NSMutableAttributedString(string: "1 Year", attributes: self.blackTextAttrs)
         self.timeFrameButtons[3].setAttributedTitle(title, for: .normal)
+        // modify time frame
+        self.timeFrame = "-6 months"
+        self.startTime = Calendar.current.date(byAdding: .month, value: -6, to: Date())!
+        self.endTime = Date()
+        // update graph
+        self.updateGraph()
     }
     
     @IBAction func changeTimeFrameOneYear(_ sender: Any) {
+        // update button looks
         var title = NSMutableAttributedString(string: "1 Week", attributes: self.blackTextAttrs)
         self.timeFrameButtons[0].setAttributedTitle(title, for: .normal)
         title = NSMutableAttributedString(string: "1 Month", attributes: self.blackTextAttrs)
@@ -259,6 +482,12 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         self.timeFrameButtons[2].setAttributedTitle(title, for: .normal)
         title = NSMutableAttributedString(string: "1 Year", attributes: self.redTextAttrs)
         self.timeFrameButtons[3].setAttributedTitle(title, for: .normal)
+        // modify time frame
+        self.timeFrame = "-1 year"
+        self.startTime = Calendar.current.date(byAdding: .year, value: -1, to: Date())!
+        self.endTime = Date()
+        // update graph
+        self.updateGraph()
     }
     
     @IBAction func recordActivity(_ sender: Any) {
@@ -294,8 +523,8 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         }
         ormNumber = round(ormNumber * 10) / 10.0
         
-        print("ORM")
-        print(ormNumber)
+//        print("ORM")
+//        print(ormNumber)
         if (dbManager.getRecord(exercise: self.exercise) == -1.0) {
             dbManager.insertRecord(exercise: self.exercise, value: ormNumber)
         } else if (ormNumber > self.personalBest) {
@@ -327,7 +556,7 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
             ORM = reps
             return String(Int(ORM))
         }
-        print(ORM)
+//        print(ORM)
 
         return String(ORM) + " " + units
     }
@@ -380,7 +609,7 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         self.options = self.weightList
         
         let selectedWeight = String(self.goal)
-        print(selectedWeight)
+//        print(selectedWeight)
         
         self.dataPicker.reloadAllComponents()
         self.dataPicker.selectRow(self.options.firstIndex(of: selectedWeight)!, inComponent: 0, animated: false)
@@ -507,7 +736,23 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
             } else {
                 self.goalUnit = weightUnits[row]
             }
+            let prevGoal = dbManager.getGoal(exercise: self.exercise)
+            if (prevGoal == -1) {
+                var goalNum = Double(self.goal)
+                if (self.goalUnit == "kgs") {
+                    goalNum *= 2.20462
+                }
+                dbManager.addToGoals(exercise: self.exercise, value: goalNum)
+            } else {
+                var goalNum = Double(self.goal)
+                if (self.goalUnit == "kgs") {
+                    goalNum *= 2.20462
+                }
+                dbManager.updateGoal(exercise: self.exercise, value: goalNum)
+            }
+//            print(dbManager.getGoal(exercise: self.exercise))
             self.myTableView.reloadData()
+            self.updateGraph()
         } else if (numComponents == 1) {
             selectedButton.setTitle(options[row], for: .normal)
         } else {
@@ -539,7 +784,16 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
             let cell : BreakdownORMTableViewCell = myTableView.dequeueReusableCell(withIdentifier: "breakdownCell", for: indexPath) as! BreakdownORMTableViewCell
             // content
             cell.imageIcon.image = UIImage(named: "dumbbell")
-            cell.weightLabel.text = String(self.personalBest) + " " + self.viewingUnits
+            if (self.weightButton.isEnabled) {
+                var num = self.personalBest
+                if (UserDefaults.standard.string(forKey: "Display Units") == "kgs") {
+                    num /= 2.20462
+                    num = round(num * 10) / 10.0
+                }
+                cell.weightLabel.text = String(num) + " " + UserDefaults.standard.string(forKey: "Display Units")!
+            } else {
+                cell.weightLabel.text = String(Int(self.personalBest)) + " reps"
+            }
             
             // styling
             cell.cellImageView.layer.borderWidth = 1
@@ -559,7 +813,9 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
             if (self.weightButton.isEnabled) {
                 cell.weightButton.setTitle(String(self.goal) + " " + self.goalUnit, for: .normal)
             } else {
-                cell.weightButton.setTitle(String(self.goal), for: .normal)
+                print("oh")
+                cell.weightButton.setTitle(String(self.goal) + " reps", for: .normal)
+                UserDefaults.standard.set("reps", forKey: "Suffix")
             }
             
             // styling
@@ -599,24 +855,14 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
     }
     
     func modifyCellStrength(cell: BreakdownStrengthLevelTableViewCell) {
-        let userWeightString = UserDefaults.standard.object(forKey: "User Weight") as! String
-        print(userWeightString)
-        var userWeight = Double(userWeightString.split(separator: " ")[0])!
-        if (userWeightString.split(separator: " ")[1] == "kgs") {
-            userWeight *= 2.20462
-        }
-        print(userWeight)
-        let userGender = UserDefaults.standard.string(forKey: "User Gender")!
-        let userAge = UserDefaults.standard.integer(forKey: "User Age")
-        let standards = dbManager.getStrengthStandards(exercise: self.exercise, weight: Int(userWeight), gender: userGender, age: userAge)
         let weight = self.personalBest
         
-        if (standards.count == 1) {
+        if (self.standards.count == 1) {
             self.changeStrengthCategoryView(level: -1, cell: cell)
         } else {
             var index = 0
-            while (index < standards.count) {
-                if (weight < standards[index]) {
+            while (index < self.standards.count) {
+                if (weight < self.standards[index]) {
                     break
                 }
                 index += 1

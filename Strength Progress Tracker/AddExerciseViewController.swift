@@ -146,7 +146,7 @@ class AddExerciseViewController: UIViewController, UICollectionViewDataSource, U
         cell.cellView.layer.borderWidth = 3
         cell.cellView.layer.cornerRadius = 15
         cell.onClick = self.chooseExercise
-        cell.cellImage.image = UIImage(named: "snatch")
+        cell.cellImage.image = UIImage(named: exerciseList[indexPath.row + (indexPath.section * 3)][0])
         return cell
     }
     

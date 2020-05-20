@@ -74,7 +74,7 @@ class SetupProfileSelectExerciseViewController: UIViewController, UICollectionVi
         cell.cellView.layer.borderWidth = 3
         cell.cellView.layer.cornerRadius = 15
         cell.onClick = self.chooseExercise
-        cell.cellImage.image = UIImage(named: "snatch")
+        cell.cellImage.image = UIImage(named: exerciseList[indexPath.row + (indexPath.section * 3)][0])
         return cell
     }
     
@@ -94,6 +94,7 @@ class SetupProfileSelectExerciseViewController: UIViewController, UICollectionVi
     }
     
     func changePages() {
+        UserDefaults.standard.set("lbs", forKey: "Display Units")
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         let setupViewController = storyBoard.instantiateViewController(withIdentifier: "tabBarController")
         self.present(setupViewController, animated:true, completion:nil)
