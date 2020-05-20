@@ -46,20 +46,11 @@ class SettingsViewController: UIViewController, UIPickerViewDataSource, UIPicker
         // set delegates n stuff
         self.dataPicker.delegate = self
         self.dataPicker.dataSource = self
-
-        // this one is specifically so that you can tap anywhere to hide the picker
-        let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(sender:)))
-        self.view.addGestureRecognizer(tap)
         
-        // set up my lists
-        setupLists()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
         // hide everything
-        self.settingsLabel.alpha = 0
-        self.descriptionLabel.alpha = 0
-        self.stacky.alpha = 0
+        self.settingsLabel.alpha = 1
+        self.descriptionLabel.alpha = 1
+        self.stacky.alpha = 1
         
         // deal with pre-existing user standards
         let userGender = UserDefaults.standard.string(forKey: "User Gender")!
@@ -71,13 +62,16 @@ class SettingsViewController: UIViewController, UIPickerViewDataSource, UIPicker
         self.weightButton.setTitle(userWeight, for: .normal)
         self.displayButton.setTitle(displayUnits, for: .normal)
         self.selectedUnits = String(userWeight.split(separator: " ")[1])
+
+        // this one is specifically so that you can tap anywhere to hide the picker
+        let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(sender:)))
+        self.view.addGestureRecognizer(tap)
         
-        // fade back in
-        UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseOut, animations: {
-            self.settingsLabel.alpha = 1
-            self.descriptionLabel.alpha = 1
-            self.stacky.alpha = 1
-        }, completion: nil)
+        // set up my lists
+        setupLists()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
     }
         
     @objc func handleTap(sender: UITapGestureRecognizer) {

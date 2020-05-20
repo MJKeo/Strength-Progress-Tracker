@@ -14,6 +14,7 @@ class BreakdownORMTableViewCell: UITableViewCell {
     @IBOutlet weak var imageIcon: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var weightLabel: UILabel!
+    @IBOutlet weak var heightContstraint: NSLayoutConstraint!
     
     override func awakeFromNib() {
         super.awakeFromNib()

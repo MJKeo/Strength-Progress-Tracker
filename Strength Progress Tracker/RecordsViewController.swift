@@ -17,6 +17,7 @@ class RecordsViewController: UIViewController, UITableViewDelegate, UITableViewD
     var recordsList: [[Any]] = []
     var exerciseList: [[String]] = []
     var userExercises: [String] = []
+    var animate: [Bool] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,6 +35,14 @@ class RecordsViewController: UIViewController, UITableViewDelegate, UITableViewD
         self.userExercises = UserDefaults.standard.object(forKey: "User Exercise List") as! [String]
         
         createLists()
+        print(self.view.frame.height)
+        let numVisible = Int(ceil(self.view.frame.height / 140.0))
+        var index = 0
+        self.animate = []
+        while(index < numVisible) {
+            animate.append(true)
+            index += 1
+        }
     }
     
     /*
@@ -62,7 +71,8 @@ class RecordsViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         let exerciseName = (recordsList[indexPath.row][0] as? String)!
         cell.exerciseTitle.text = exerciseName
-        if (self.exerciseList.contains([exerciseName, "bodyweight"]) || self.exerciseList.contains([exerciseName, "weights"])) {
+        let tempList = dbManager.getExercises()
+        if (tempList.contains([exerciseName, "bodyweight"]) || tempList.contains([exerciseName, "weights"])) {
             cell.exerciseIcon.image = UIImage(named: exerciseName)
         } else {
             cell.exerciseIcon.image = UIImage(named: "custom")
@@ -86,13 +96,15 @@ class RecordsViewController: UIViewController, UITableViewDelegate, UITableViewD
         cell.mainView.layer.borderColor = UIColor.gray.cgColor
         cell.StrengthLevelView.layer.cornerRadius = cell.StrengthLevelView.frame.height / 3.1
         cell.StrengthLevelView.layer.borderWidth = 1
-        cell.alpha = 0
-        UIView.animate(withDuration: 0.5, delay: TimeInterval(Double(indexPath.row) / 10), options: .curveEaseOut, animations: {
-            cell.alpha = 1
-        }, completion: nil)
+        if (indexPath.row < self.animate.count && self.animate[indexPath.row]) {
+            cell.alpha = 0
+            UIView.animate(withDuration: 0.5, delay: TimeInterval(Double(indexPath.row) / 10), options: .curveEaseOut, animations: {
+                cell.alpha = 1
+            }, completion: nil)
+            self.animate[indexPath.row] = false
+        }
         
         self.modifyForStrengthStandards(cell: cell, weight: bestORM, exercise: recordsList[indexPath.row][0] as! String)
-        
         return cell
     }
     
@@ -106,12 +118,10 @@ class RecordsViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     func modifyForStrengthStandards(cell: RecordTableViewCell, weight: Double, exercise: String) {
         let userWeightString = UserDefaults.standard.object(forKey: "User Weight") as! String
-        print(userWeightString)
         var userWeight = Double(userWeightString.split(separator: " ")[0])!
         if (userWeightString.split(separator: " ")[1] == "kgs") {
             userWeight *= 2.20462
         }
-        print(userWeight)
         let userGender = UserDefaults.standard.string(forKey: "User Gender")!
         let userAge = UserDefaults.standard.integer(forKey: "User Age")
         let standards = dbManager.getStrengthStandards(exercise: exercise, weight: Int(userWeight), gender: userGender, age: userAge)

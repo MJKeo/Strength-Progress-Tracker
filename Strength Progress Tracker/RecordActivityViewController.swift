@@ -116,6 +116,12 @@ class RecordActivityViewController: UIViewController, UIPickerViewDelegate, UIPi
     }
     
     func createLists() {
+        // reset lists first
+        self.repsOptions = []
+        self.weightOptions = []
+        self.exerciseList = []
+        self.exerciseNames = []
+        
         var index = 0
         while (index < 1000) {
             if (index < 100) {

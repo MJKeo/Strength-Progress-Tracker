@@ -329,6 +329,7 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         self.axisDates = dataDates
         
         self.progressChart.xAxis.valueFormatter = DefaultAxisValueFormatter { (value, axis) -> String in return self.labelHandler(index: Int(value), dates: dataDates) }
+        self.progressChart.leftAxis.valueFormatter = DefaultAxisValueFormatter { (value, axis) -> String in return self.leftLabelHandler(value: value) }
     }
     
     func refreshData() {
@@ -379,6 +380,15 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         return dates[index]
     }
     
+    func leftLabelHandler(value: Double) -> String {
+        if (self.weightButton.isEnabled) {
+            return String(Int(value)) + " " + UserDefaults.standard.string(forKey: "Display Units")!
+        } else {
+            return String(Int(value)) + " reps"
+        }
+        
+    }
+    
     
     @IBAction func goToSettings(_ sender: Any) {
         // get extra info on my exercise
@@ -410,6 +420,9 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         let userGender = UserDefaults.standard.string(forKey: "User Gender")!
         let userAge = UserDefaults.standard.integer(forKey: "User Age")
         self.standards = dbManager.getStrengthStandards(exercise: self.exercise, weight: Int(userWeight), gender: userGender, age: userAge)
+        if (self.standards[0] == -1) {
+            self.standards = []
+        }
     }
     
     @objc func handleTap(sender: UITapGestureRecognizer) {
@@ -493,7 +506,7 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
     @IBAction func recordActivity(_ sender: Any) {
         // set up dark background to fade in
         self.darkBackgroundHeight.constant = self.view.frame.height
-        self.darkBackgroundWidth.constant = self.view.frame.width
+        self.darkBackgroundWidth.constant = self.view.frame.width + 10
         self.darkBackgroundView.frame.origin.x = self.view.frame.origin.x
         self.darkBackgroundView.frame.origin.y = self.view.frame.origin.y
         self.darkBackgroundView.alpha = 0
@@ -782,8 +795,6 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if (indexPath.row == 0) {
             let cell : BreakdownORMTableViewCell = myTableView.dequeueReusableCell(withIdentifier: "breakdownCell", for: indexPath) as! BreakdownORMTableViewCell
-            // content
-            cell.imageIcon.image = UIImage(named: "dumbbell")
             if (self.weightButton.isEnabled) {
                 var num = self.personalBest
                 if (UserDefaults.standard.string(forKey: "Display Units") == "kgs") {
@@ -798,11 +809,14 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
             // styling
             cell.cellImageView.layer.borderWidth = 1
             cell.cellImageView.layer.borderColor = UIColor.black.cgColor
-            cell.cellImageView.layer.cornerRadius = 28
+            cell.cellImageView.layer.cornerRadius = (((self.myTableView.frame.height / 3.1) - 10) * 0.753077) / 2
             cell.cellImageView.clipsToBounds = true
             cell.mainView.layer.borderWidth = 1
             cell.mainView.layer.borderColor = UIColor.gray.cgColor
             cell.mainView.layer.cornerRadius = 10
+            
+            // content
+            cell.imageIcon.image = UIImage(named: "dumbbell")
             
             return cell
         } else if (indexPath.row == 1) {
@@ -821,7 +835,7 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
             // styling
             cell.cellImageView.layer.borderWidth = 1
             cell.cellImageView.layer.borderColor = UIColor.black.cgColor
-            cell.cellImageView.layer.cornerRadius = 24
+            cell.cellImageView.layer.cornerRadius = (((self.myTableView.frame.height / 3.1) - 10) * 0.753077) / 2
             cell.cellImageView.clipsToBounds = true
             cell.mainView.layer.borderWidth = 1
             cell.mainView.layer.borderColor = UIColor.gray.cgColor
@@ -834,19 +848,23 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         } else {
             let cell : BreakdownStrengthLevelTableViewCell = myTableView.dequeueReusableCell(withIdentifier: "breakdownSLCell", for: indexPath) as! BreakdownStrengthLevelTableViewCell
             
-            // content
-            cell.imageIcon.image = UIImage(named: "chart")
-            
             // styling
             cell.cellImageView.layer.borderWidth = 1
             cell.cellImageView.layer.borderColor = UIColor.black.cgColor
-            cell.cellImageView.layer.cornerRadius = 24
+            cell.cellImageView.layer.cornerRadius = (((self.myTableView.frame.height / 3.1) - 10) * 0.753077) / 2
             cell.cellImageView.clipsToBounds = true
             cell.mainView.layer.borderWidth = 1
             cell.mainView.layer.borderColor = UIColor.gray.cgColor
             cell.mainView.layer.cornerRadius = 10
             cell.strengthLevelButton.layer.borderWidth = 1
-            cell.strengthLevelButton.layer.cornerRadius = 15
+            cell.strengthLevelButton.layer.cornerRadius = 10
+            print("hereee")
+            print(cell.cellImageView.frame.height)
+            print(cell.cellImageView.frame.width)
+            print(cell.cellImageView.frame)
+            
+            // content
+            cell.imageIcon.image = UIImage(named: "chart")
             
             self.modifyCellStrength(cell: cell)
             

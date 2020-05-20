@@ -23,6 +23,8 @@ class ORMViewController: UIViewController {
     @IBOutlet weak var liftRepsButton: UIButton!
     @IBOutlet weak var liftWeightButton: UIButton!
     @IBOutlet weak var exerciseButton: UIButton!
+    @IBOutlet weak var calculateButton: UIButton!
+    
     
     // Strength standards views + texts
     @IBOutlet var strengthStandardsViews: [UIView]!
@@ -54,6 +56,13 @@ class ORMViewController: UIViewController {
     var exerciseNames: [String] = []
     var selectedButton: UIButton!
     
+    // how did we get this?
+    @IBOutlet weak var howDidWeGetThisView: UIView!
+    @IBOutlet weak var hdwgtBottom: NSLayoutConstraint!
+    @IBOutlet weak var darkBackground: UIView!
+    @IBOutlet weak var darkBGHeight: NSLayoutConstraint!
+    @IBOutlet weak var darkBGWidth: NSLayoutConstraint!
+    
     /*
         SETUP FUNCTIONS
      */
@@ -75,6 +84,7 @@ class ORMViewController: UIViewController {
     
     @objc func handleTap(sender: UITapGestureRecognizer) {
         hidePicker(ageButton as Any)
+        hideHowDidWe()
         self.view.endEditing(true)
     }
     
@@ -86,6 +96,7 @@ class ORMViewController: UIViewController {
         self.strengthCategoryView.alpha = 0
         self.mainStandardsView.alpha = 0
         self.titleLabel.alpha = 0
+        self.hdwgtBottom.constant = -632
         
         // populate user info into appropriate buttons
         self.weightButton.setTitle(UserDefaults.standard.object(forKey: "User Weight") as? String, for: .normal)
@@ -110,9 +121,20 @@ class ORMViewController: UIViewController {
         self.exerciseButton.setTitle("Select Exercise", for: .normal)
         self.liftRepsButton.setTitle("5", for: .normal)
         self.liftWeightButton.setTitle("200 lbs", for: .normal)
+        hideHowDidWe()
     }
     
     func doStyling() {
+        // HDWGT View
+        self.howDidWeGetThisView.layer.borderColor = UIColor.black.cgColor
+        self.howDidWeGetThisView.layer.borderWidth = 1
+        self.howDidWeGetThisView.layer.cornerRadius = 10
+        
+        // calculate button
+        self.calculateButton.layer.borderWidth = 1
+        self.calculateButton.layer.borderColor = UIColor(red: (162/255.0), green: (0/255.0), blue: (34/255.0), alpha: 1).cgColor
+        self.calculateButton.backgroundColor = UIColor(red: (207/255.0), green: (41/255.0), blue: (29/255.0), alpha: 1)
+        
         // put borders on personal info buttons
         self.weightButton.layer.borderWidth = 1
         self.weightButton.layer.borderColor = UIColor.darkGray.cgColor
@@ -287,6 +309,30 @@ class ORMViewController: UIViewController {
         }
         self.selectedButton?.setTitle(value, for: .normal)
     }
+    
+    @IBAction func showHowDidWe(_ sender: Any) {
+        self.darkBackground.frame.origin.x = self.view.frame.origin.x
+        self.darkBackground.frame.origin.y = self.view.frame.origin.y
+        self.darkBGHeight.constant = self.view.frame.height
+        self.darkBGWidth.constant = self.view.frame.width
+        self.darkBackground.alpha = 0
+        UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseOut, animations: {
+            self.howDidWeGetThisView.frame.origin.y = self.view.frame.height / 2 - (self.howDidWeGetThisView.frame.height / 2)
+            self.darkBackground.alpha = 0.35
+        }, completion: nil)
+        self.hdwgtBottom.constant = (self.view.frame.height - self.howDidWeGetThisView.frame.height) / 2
+    }
+    
+    func hideHowDidWe() {
+        UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseOut, animations: {
+            self.howDidWeGetThisView.frame.origin.y = self.view.frame.height + 10
+            self.darkBackground.alpha = 0
+        }, completion: {(finished: Bool) in
+            self.darkBGHeight.constant = 1
+        })
+        self.hdwgtBottom.constant = -632
+    }
+    
     
     func changeStrengthCategoryView(level: Int) {
         if (level == 0) {

@@ -139,8 +139,6 @@ class HomePageViewController: UIViewController, UICollectionViewDelegate, UIColl
             self.closestGoalButton.alpha = 0
         } else {
             self.closestExercise = closestGoal[0] as! String
-            print("ape")
-            print(self.exerciseList)
             if (exerciseList.firstIndex(of: [self.closestExercise,"bodyweight"]) != nil) {
                 let text = closestGoal[0] as! String + " " + String(Int(closestGoal[1] as! Double)) + " reps"
                 self.closestGoalButton.setTitle(text, for: .normal)
@@ -165,13 +163,14 @@ class HomePageViewController: UIViewController, UICollectionViewDelegate, UIColl
     
     func updateGraph() {
         self.activity = dbManager.getRecentActivity(exercise: self.mostRecentExercise, timeFrame: "-6 days")
-        print(self.activity)
+        var goal = dbManager.getGoal(exercise: self.mostRecentExercise)
+        if (UserDefaults.standard.string(forKey: "Display Units") == "kgs") {
+            goal /= 2.20462
+        }
         
         var myDataEntries: [ChartDataEntry] = []
         var dataDates: [String] = []
         var myGoalEntries: [ChartDataEntry] = []
-        
-        var standardsSets: [[ChartDataEntry]] = [[],[],[],[],[]]
         
         let formatter = DateFormatter()
         formatter.dateFormat = "MM/dd"
@@ -179,7 +178,7 @@ class HomePageViewController: UIViewController, UICollectionViewDelegate, UIColl
         yearFormatter.dateFormat = "MM/dd/yyyy"
         
         let endTimeString = yearFormatter.string(from: Calendar.current.date(byAdding: .day, value: 1, to: Date())!)
-        var startTime = Calendar.current.date(byAdding: .day, value: -6, to: Date())
+        let startTime = Calendar.current.date(byAdding: .day, value: -6, to: Date())
         
         var tiem = startTime!
         var numDates = 0
@@ -199,6 +198,9 @@ class HomePageViewController: UIViewController, UICollectionViewDelegate, UIColl
             if (!dataDates.contains(formatter.string(from: time))) {
                 dataDates.append(formatter.string(from: time))
             }
+            // add goal
+            let goalPoint = ChartDataEntry(x: Double(index), y: goal)
+            myGoalEntries.append(goalPoint)
             // determine if we add this data
             if (entryIndex < activity.count) {
                 let entry = activity[entryIndex]
@@ -230,8 +232,6 @@ class HomePageViewController: UIViewController, UICollectionViewDelegate, UIColl
             index += 1
         }
         
-//        print(dataDates)
-        
         let myDataSet = LineChartDataSet(entries: myDataEntries, label: "One Rep Maxes")
         myDataSet.colors = [UIColor(red: (237/255.0), green: (17/255.0), blue: (51/255.0), alpha: 1)]
         myDataSet.circleColors = [UIColor(red: (162/255.0), green: (0/255.0), blue: (34/255.0), alpha: 1)]
@@ -240,6 +240,14 @@ class HomePageViewController: UIViewController, UICollectionViewDelegate, UIColl
             myDataSet.drawCirclesEnabled = false
         }
         let myData = LineChartData(dataSet: myDataSet)
+        
+        // goal data set
+        let goalDataSet = LineChartDataSet(entries: myGoalEntries, label: "My Goal")
+        goalDataSet.colors = [UIColor.black]
+        goalDataSet.drawCirclesEnabled = false
+        goalDataSet.drawValuesEnabled = false
+        goalDataSet.lineWidth = 3
+        myData.addDataSet(goalDataSet)
 
         self.recentGraph.xAxis.valueFormatter = DefaultAxisValueFormatter { (value, axis) -> String in return "l" }
         self.recentGraph.data = myData
@@ -257,13 +265,22 @@ class HomePageViewController: UIViewController, UICollectionViewDelegate, UIColl
         self.recentGraph.doubleTapToZoomEnabled = false
         self.recentGraph.pinchZoomEnabled = false
         
-        print(numDates)
         self.recentGraph.xAxis.labelCount = numDates
         self.recentGraph.xAxis.valueFormatter = DefaultAxisValueFormatter { (value, axis) -> String in return self.labelHandler(index: Int(value), dates: dataDates) }
+        self.recentGraph.leftAxis.valueFormatter = DefaultAxisValueFormatter { (value, axis) -> String in return self.leftLabelHandler(value: value) }
     }
     
     func labelHandler(index: Int, dates: [String]) -> String {
         return dates[index]
+    }
+    
+    func leftLabelHandler(value: Double) -> String {
+        if (exerciseList.firstIndex(of: [self.mostRecentExercise,"bodyweight"]) != nil) {
+            return String(Int(value)) + " reps"
+        } else {
+            return String(Int(value)) + " " + UserDefaults.standard.string(forKey: "Display Units")!
+        }
+        
     }
     
     func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {
