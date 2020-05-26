@@ -35,7 +35,6 @@
 		49BA2610244A4030004B16B3 /* SetupProfileSelectExerciseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49BA260F244A4030004B16B3 /* SetupProfileSelectExerciseViewController.swift */; };
 		49BA2612244A444D004B16B3 /* ExerciseCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49BA2611244A444D004B16B3 /* ExerciseCollectionViewCell.swift */; };
 		49BA71EE2449197000411EA1 /* GenericPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49BA71ED2449197000411EA1 /* GenericPickerViewController.swift */; };
-		49C2BB11245B355900547BE6 /* GoalsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C2BB10245B355900547BE6 /* GoalsViewController.swift */; };
 		CCD559BC61449CE1AE3E38CD /* libPods-Strength Progress Tracker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 49938E13425D372AE086EA25 /* libPods-Strength Progress Tracker.a */; };
 /* End PBXBuildFile section */
 
@@ -45,6 +44,7 @@
 		490EF52A24743F5100724BFF /* RecentActivityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentActivityViewController.swift; sourceTree = "<group>"; };
 		490EF52C24743F9500724BFF /* RecentActivityTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentActivityTableViewCell.swift; sourceTree = "<group>"; };
 		490EF52E2474615F00724BFF /* EditExerciseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditExerciseViewController.swift; sourceTree = "<group>"; };
+		49127AAA2475C0C6004C24A2 /* Strength Progress Tracker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Strength Progress Tracker.entitlements"; sourceTree = "<group>"; };
 		492263D124607543001093D7 /* RecordsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordsViewController.swift; sourceTree = "<group>"; };
 		492263D324607AC4001093D7 /* RecordTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordTableViewCell.swift; sourceTree = "<group>"; };
 		4928F9D0244779F400633D82 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
@@ -72,7 +72,6 @@
 		49BA260F244A4030004B16B3 /* SetupProfileSelectExerciseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupProfileSelectExerciseViewController.swift; sourceTree = "<group>"; };
 		49BA2611244A444D004B16B3 /* ExerciseCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseCollectionViewCell.swift; sourceTree = "<group>"; };
 		49BA71ED2449197000411EA1 /* GenericPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericPickerViewController.swift; sourceTree = "<group>"; };
-		49C2BB10245B355900547BE6 /* GoalsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsViewController.swift; sourceTree = "<group>"; };
 		A6ED0AC8191BB9815891556A /* Pods-Strength Progress Tracker.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strength Progress Tracker.release.xcconfig"; path = "Target Support Files/Pods-Strength Progress Tracker/Pods-Strength Progress Tracker.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -109,6 +108,7 @@
 		4972BF502443DAA1009261B6 /* Strength Progress Tracker */ = {
 			isa = PBXGroup;
 			children = (
+				49127AAA2475C0C6004C24A2 /* Strength Progress Tracker.entitlements */,
 				4972BF512443DAA1009261B6 /* AppDelegate.swift */,
 				4972BF532443DAA1009261B6 /* SceneDelegate.swift */,
 				4972BF552443DAA1009261B6 /* ViewController.swift */,
@@ -134,7 +134,6 @@
 				4938D8A2244B8E6B00DCA81B /* RecordActivityViewController.swift */,
 				492263D124607543001093D7 /* RecordsViewController.swift */,
 				492263D324607AC4001093D7 /* RecordTableViewCell.swift */,
-				49C2BB10245B355900547BE6 /* GoalsViewController.swift */,
 				496FDA352448BE2800E715E6 /* ORMViewController.swift */,
 				49BA71ED2449197000411EA1 /* GenericPickerViewController.swift */,
 				4928F9D0244779F400633D82 /* DatabaseManager.swift */,
@@ -263,7 +262,6 @@
 				4972BF562443DAA1009261B6 /* ViewController.swift in Sources */,
 				49BA71EE2449197000411EA1 /* GenericPickerViewController.swift in Sources */,
 				490EF52F2474615F00724BFF /* EditExerciseViewController.swift in Sources */,
-				49C2BB11245B355900547BE6 /* GoalsViewController.swift in Sources */,
 				4972BF522443DAA1009261B6 /* AppDelegate.swift in Sources */,
 				4972BF6C24442210009261B6 /* SetupProfileInputViewController.swift in Sources */,
 				492263D424607AC4001093D7 /* RecordTableViewCell.swift in Sources */,
@@ -429,6 +427,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "Strength Progress Tracker/Strength Progress Tracker.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = P2SH9TP2D3;
 				INFOPLIST_FILE = "Strength Progress Tracker/Info.plist";
@@ -437,6 +436,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "mkeohane.Strength-Progress-Tracker";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -451,6 +451,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "Strength Progress Tracker/Strength Progress Tracker.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = P2SH9TP2D3;
 				INFOPLIST_FILE = "Strength Progress Tracker/Info.plist";
@@ -459,6 +460,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "mkeohane.Strength-Progress-Tracker";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

@@ -28,6 +28,10 @@ class RecentActivityViewController: UIViewController, UITableViewDelegate, UITab
         myTable.dataSource = self
     }
     
+    @IBAction func goBack(_ sender: Any) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
     /*
         REGULAR FUNCTIONALITY
      */

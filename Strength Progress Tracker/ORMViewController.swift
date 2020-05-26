@@ -79,7 +79,10 @@ class ORMViewController: UIViewController {
         
         // lets the user tap anywhere to dismiss the picker
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(sender:)))
+        let swipe = UISwipeGestureRecognizer(target: self, action: #selector(self.handleTap(sender:)))
+        swipe.direction = UISwipeGestureRecognizer.Direction.down
         self.view.addGestureRecognizer(tap)
+        self.view.addGestureRecognizer(swipe)
     }
     
     @objc func handleTap(sender: UITapGestureRecognizer) {

@@ -80,7 +80,6 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         super.viewDidLoad()
         
         self.exercise = UserDefaults.standard.object(forKey: "Selected Exercise") as! String
-        print("bruhbruh")
         self.titleLabel.text = exercise
         self.personalBest = dbManager.getRecord(exercise: self.exercise)
         if (self.personalBest < 0) {
@@ -105,7 +104,10 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         
         // allows tap on screen to get rid of popups and pickers
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(sender:)))
+        let swipe = UISwipeGestureRecognizer(target: self, action: #selector(self.handleTap(sender:)))
+        swipe.direction = UISwipeGestureRecognizer.Direction.down
         self.view.addGestureRecognizer(tap)
+        self.view.addGestureRecognizer(swipe)
         
         // populate graph
         updateGraph()
@@ -114,8 +116,8 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         refresh()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        
+    @IBAction func goBack(_ sender: Any) {
+        self.dismiss(animated: true, completion: nil)
     }
     
     func refresh() {
@@ -163,7 +165,11 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
      */
     func updateGraph() {
         self.activity = dbManager.getRecentActivity(exercise: self.exercise, timeFrame: self.timeFrame)
-        print(self.activity)
+        if (self.timeFrame == "all" && self.activity.count > 0) {
+            let yearFormatter = DateFormatter()
+            yearFormatter.dateFormat = "yyyy-MM-dd"
+            self.startTime = yearFormatter.date(from:self.activity[0][0])!
+        }
         
         var myDataEntries: [ChartDataEntry] = []
         var dataDates: [String] = []
@@ -181,7 +187,6 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         var tiem = self.startTime
         var numDates = 0
         while(yearFormatter.string(from: tiem) != endTimeString) {
-//            print(formatter.string(from: tiem))
             tiem = Calendar.current.date(byAdding: .day, value: 1, to: tiem)!
             numDates += 1
         }
@@ -190,7 +195,6 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         var index = 0
         var entryIndex = 0
         var time = self.startTime
-//        print(endTimeString)
         while (yearFormatter.string(from: time) != endTimeString) {
             // add date
             if (!dataDates.contains(formatter.string(from: time))) {
@@ -252,7 +256,6 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
                         overallWeight /= 2.20462
                         overallWeight = round(overallWeight * 10) / 10.0
                     }
-                    
                     let dataPoint = ChartDataEntry(x: Double(index), y: overallWeight)
                     myDataEntries.append(dataPoint)
                     entryIndex += 1
@@ -266,8 +269,6 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
             
             index += 1
         }
-        
-//        print(dataDates)
         
         let myDataSet = LineChartDataSet(entries: myDataEntries, label: "One Rep Maxes")
         myDataSet.colors = [UIColor(red: (237/255.0), green: (17/255.0), blue: (51/255.0), alpha: 1)]
@@ -340,11 +341,9 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
             self.personalBest = 0
         }
         self.myTableView.reloadData()
-//        print(dbManager.getRecordsList())
     }
     
     func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {
-        print(highlight.dataSetIndex)
         var description = ""
         let units = UserDefaults.standard.string(forKey: "Display Units")!
         if (highlight.dataSetIndex == 0) { // USER DATA SET
@@ -411,12 +410,10 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
     
     func getStandards() {
         let userWeightString = UserDefaults.standard.object(forKey: "User Weight") as! String
-        print(userWeightString)
         var userWeight = Double(userWeightString.split(separator: " ")[0])!
         if (userWeightString.split(separator: " ")[1] == "kgs") {
             userWeight *= 2.20462
         }
-//        print(userWeight)
         let userGender = UserDefaults.standard.string(forKey: "User Gender")!
         let userAge = UserDefaults.standard.integer(forKey: "User Age")
         self.standards = dbManager.getStrengthStandards(exercise: self.exercise, weight: Int(userWeight), gender: userGender, age: userAge)
@@ -439,7 +436,7 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         self.timeFrameButtons[1].setAttributedTitle(title, for: .normal)
         title = NSMutableAttributedString(string: "6 Months", attributes: self.blackTextAttrs)
         self.timeFrameButtons[2].setAttributedTitle(title, for: .normal)
-        title = NSMutableAttributedString(string: "1 Year", attributes: self.blackTextAttrs)
+        title = NSMutableAttributedString(string: "All Time", attributes: self.blackTextAttrs)
         self.timeFrameButtons[3].setAttributedTitle(title, for: .normal)
         // modify time frame
         self.timeFrame = "-6 days"
@@ -457,7 +454,7 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         self.timeFrameButtons[1].setAttributedTitle(title, for: .normal)
         title = NSMutableAttributedString(string: "6 Months", attributes: self.blackTextAttrs)
         self.timeFrameButtons[2].setAttributedTitle(title, for: .normal)
-        title = NSMutableAttributedString(string: "1 Year", attributes: self.blackTextAttrs)
+        title = NSMutableAttributedString(string: "All Time", attributes: self.blackTextAttrs)
         self.timeFrameButtons[3].setAttributedTitle(title, for: .normal)
         // modify time frame
         self.timeFrame = "-1 month"
@@ -475,7 +472,7 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         self.timeFrameButtons[1].setAttributedTitle(title, for: .normal)
         title = NSMutableAttributedString(string: "6 Months", attributes: self.redTextAttrs)
         self.timeFrameButtons[2].setAttributedTitle(title, for: .normal)
-        title = NSMutableAttributedString(string: "1 Year", attributes: self.blackTextAttrs)
+        title = NSMutableAttributedString(string: "All Time", attributes: self.blackTextAttrs)
         self.timeFrameButtons[3].setAttributedTitle(title, for: .normal)
         // modify time frame
         self.timeFrame = "-6 months"
@@ -493,11 +490,10 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         self.timeFrameButtons[1].setAttributedTitle(title, for: .normal)
         title = NSMutableAttributedString(string: "6 Months", attributes: self.blackTextAttrs)
         self.timeFrameButtons[2].setAttributedTitle(title, for: .normal)
-        title = NSMutableAttributedString(string: "1 Year", attributes: self.redTextAttrs)
+        title = NSMutableAttributedString(string: "All Time", attributes: self.redTextAttrs)
         self.timeFrameButtons[3].setAttributedTitle(title, for: .normal)
         // modify time frame
-        self.timeFrame = "-1 year"
-        self.startTime = Calendar.current.date(byAdding: .year, value: -1, to: Date())!
+        self.timeFrame = "all"
         self.endTime = Date()
         // update graph
         self.updateGraph()
@@ -536,8 +532,6 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         }
         ormNumber = round(ormNumber * 10) / 10.0
         
-//        print("ORM")
-//        print(ormNumber)
         if (dbManager.getRecord(exercise: self.exercise) == -1.0) {
             dbManager.insertRecord(exercise: self.exercise, value: ormNumber)
         } else if (ormNumber > self.personalBest) {
@@ -569,7 +563,6 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
             ORM = reps
             return String(Int(ORM))
         }
-//        print(ORM)
 
         return String(ORM) + " " + units
     }
@@ -622,7 +615,6 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         self.options = self.weightList
         
         let selectedWeight = String(self.goal)
-//        print(selectedWeight)
         
         self.dataPicker.reloadAllComponents()
         self.dataPicker.selectRow(self.options.firstIndex(of: selectedWeight)!, inComponent: 0, animated: false)
@@ -745,7 +737,6 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         if (isGoalSelected) {
             if (component == 0) {
                 self.goal = Int(options[row])!
-                print(self.goal)
             } else {
                 self.goalUnit = weightUnits[row]
             }
@@ -763,7 +754,6 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
                 }
                 dbManager.updateGoal(exercise: self.exercise, value: goalNum)
             }
-//            print(dbManager.getGoal(exercise: self.exercise))
             self.myTableView.reloadData()
             self.updateGraph()
         } else if (numComponents == 1) {
@@ -827,7 +817,6 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
             if (self.weightButton.isEnabled) {
                 cell.weightButton.setTitle(String(self.goal) + " " + self.goalUnit, for: .normal)
             } else {
-                print("oh")
                 cell.weightButton.setTitle(String(self.goal) + " reps", for: .normal)
                 UserDefaults.standard.set("reps", forKey: "Suffix")
             }
@@ -858,10 +847,6 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
             cell.mainView.layer.cornerRadius = 10
             cell.strengthLevelButton.layer.borderWidth = 1
             cell.strengthLevelButton.layer.cornerRadius = 10
-            print("hereee")
-            print(cell.cellImageView.frame.height)
-            print(cell.cellImageView.frame.width)
-            print(cell.cellImageView.frame)
             
             // content
             cell.imageIcon.image = UIImage(named: "chart")

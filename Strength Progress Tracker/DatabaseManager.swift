@@ -1632,9 +1632,10 @@ class DatabaseManager {
         var statement: OpaquePointer?
         var addQuery = "INSERT INTO UserActivity (exercise, time_recorded, reps, weight, orm) VALUES ("
         addQuery += "'" + exercise + "',"
-        addQuery += "date()," + String(reps) + ",'"
+        addQuery += "Date('now','localtime')," + String(reps) + ",'"
         addQuery += weight + "'," + String(orm) + ")"
         print(addQuery)
+        
         
         if sqlite3_prepare(userDb, addQuery, -1, &statement, nil) != SQLITE_OK {
            print("error binding query")
@@ -1718,7 +1719,7 @@ class DatabaseManager {
         
         // do time frame filtering
         if (timeFrame != "all") {
-            selectQuery += " AND (time_recorded BETWEEN date('now','" + timeFrame + "') AND date()) ORDER BY time_recorded"
+            selectQuery += " AND (time_recorded BETWEEN date('now','" + timeFrame + "') AND date('now', 'localtime')) ORDER BY time_recorded"
         } else {
             selectQuery += " ORDER BY time_recorded"
         }

@@ -61,7 +61,10 @@ class EditExerciseViewController: UIViewController, UIPickerViewDelegate, UIPick
         
         // this one is specifically so that you can tap anywhere to hide the picker
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(sender:)))
+        let swipe = UISwipeGestureRecognizer(target: self, action: #selector(self.handleTap(sender:)))
+        swipe.direction = UISwipeGestureRecognizer.Direction.down
         self.view.addGestureRecognizer(tap)
+        self.view.addGestureRecognizer(swipe)
     }
     
     @objc func handleTap(sender: UITapGestureRecognizer) {
@@ -124,9 +127,12 @@ class EditExerciseViewController: UIViewController, UIPickerViewDelegate, UIPick
             UserDefaults.standard.set(list, forKey: "User Exercise List")
             
         }
-        let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
-        let setupViewController = storyBoard.instantiateViewController(withIdentifier: "exerciseBreakdown")
-        self.present(setupViewController, animated:true, completion:nil)
+    }
+    
+    
+    @IBAction func goBack(_ sender: Any) {
+        self.saveValues(self)
+        self.dismiss(animated: true, completion: nil)
     }
     
     /*

@@ -65,7 +65,10 @@ class SettingsViewController: UIViewController, UIPickerViewDataSource, UIPicker
 
         // this one is specifically so that you can tap anywhere to hide the picker
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(sender:)))
+        let swipe = UISwipeGestureRecognizer(target: self, action: #selector(self.handleTap(sender:)))
+        swipe.direction = UISwipeGestureRecognizer.Direction.down
         self.view.addGestureRecognizer(tap)
+        self.view.addGestureRecognizer(swipe)
         
         // set up my lists
         setupLists()
@@ -73,10 +76,19 @@ class SettingsViewController: UIViewController, UIPickerViewDataSource, UIPicker
     
     override func viewDidAppear(_ animated: Bool) {
     }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        
+    }
         
     @objc func handleTap(sender: UITapGestureRecognizer) {
         hidePicker(self)
         self.view.endEditing(true)
+    }
+    
+    @IBAction func TransitionBack(_ sender: Any) {
+        self.saveValues(self)
+        self.dismiss(animated: true, completion: nil)
     }
     
     func setupLists() {

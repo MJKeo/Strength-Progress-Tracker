@@ -30,6 +30,8 @@ class RecordActivityViewController: UIViewController, UIPickerViewDelegate, UIPi
     @IBOutlet weak var popupORM: UILabel!
     @IBOutlet weak var popupButton: UIButton!
     @IBOutlet weak var popupPB: UILabel!
+    @IBOutlet weak var viewFinesseStuff: UIView!
+    @IBOutlet weak var popupTopConstraint: NSLayoutConstraint!
     
     // miscellaneous screen items
     @IBOutlet weak var titleLabel: UILabel!
@@ -79,7 +81,10 @@ class RecordActivityViewController: UIViewController, UIPickerViewDelegate, UIPi
         
         // lets the user tap anywhere to dismiss the picker
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(sender:)))
+        let swipe = UISwipeGestureRecognizer(target: self, action: #selector(self.handleTap(sender:)))
+        swipe.direction = UISwipeGestureRecognizer.Direction.down
         self.view.addGestureRecognizer(tap)
+        self.view.addGestureRecognizer(swipe)
     }
     
     @objc func handleTap(sender: UITapGestureRecognizer) {
@@ -268,12 +273,14 @@ class RecordActivityViewController: UIViewController, UIPickerViewDelegate, UIPi
         self.popupORM.text = "ORM: " + orm
         
         let currentBest = dbManager.getRecord(exercise: exerciseButton.title(for: .normal)!)
+        self.popupTopConstraint.constant = 0
         if (currentBest == -1.0) {
             dbManager.insertRecord(exercise: exerciseButton.title(for: .normal)!, value: ormNumber)
         } else if (ormNumber > currentBest) {
             dbManager.setRecord(exercise: exerciseButton.title(for: .normal)!, value: ormNumber)
         } else {
             self.popupPB.alpha = 0
+            self.popupTopConstraint.constant = (self.viewFinesseStuff.frame.height / 2) - (self.popupORM.frame.height / 2)
         }
         
         // causes delay to let the animation run

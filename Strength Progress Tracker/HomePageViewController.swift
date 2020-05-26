@@ -10,6 +10,9 @@ import UIKit
 import Charts
 
 class HomePageViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, ChartViewDelegate {
+    // overall view
+    @IBOutlet weak var overallView: UIView!
+    
     // Recent activity stuff
     @IBOutlet weak var recentExerciseLabel: UILabel!
     @IBOutlet weak var recentGraph: LineChartView!
@@ -32,10 +35,7 @@ class HomePageViewController: UIViewController, UICollectionViewDelegate, UIColl
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(dbManager.getUserExercises())
-        print(dbManager.getRecordsList())
-        print(dbManager.getGoalsList())
-        
+
         exerciseCollectionView.delegate = self
         exerciseCollectionView.dataSource = self
 
@@ -55,11 +55,9 @@ class HomePageViewController: UIViewController, UICollectionViewDelegate, UIColl
         if ((userExerciseList.count + 1) % 3 == 0) {
             numRows = (userExerciseList.count + 1) / 3
         } else {
-//            print("yeah")
             numRows = (userExerciseList.count + 1) / 3 + 1
         }
         
-//        print(numRows)
         exerciseCVHeight.constant = (itemSize + 15) * CGFloat(numRows)
         
         // set layout for "my lifts" collection view
@@ -107,8 +105,6 @@ class HomePageViewController: UIViewController, UICollectionViewDelegate, UIColl
     
     func viewExerciseBreakdown(exercise: String) {
         // this is where I deal with changing the page to the appropriate exercise
-        // TO BE IMPLEMENTED
-        print(exercise)
         UserDefaults.standard.set(exercise, forKey: "Selected Exercise")
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
         let setupViewController = storyBoard.instantiateViewController(withIdentifier: "exerciseBreakdown")
@@ -183,7 +179,6 @@ class HomePageViewController: UIViewController, UICollectionViewDelegate, UIColl
         var tiem = startTime!
         var numDates = 0
         while(yearFormatter.string(from: tiem) != endTimeString) {
-//            print(formatter.string(from: tiem))
             tiem = Calendar.current.date(byAdding: .day, value: 1, to: tiem)!
             numDates += 1
         }
@@ -192,7 +187,6 @@ class HomePageViewController: UIViewController, UICollectionViewDelegate, UIColl
         var index = 0
         var entryIndex = 0
         var time = startTime!
-//        print(endTimeString)
         while (yearFormatter.string(from: time) != endTimeString) {
             // add date
             if (!dataDates.contains(formatter.string(from: time))) {

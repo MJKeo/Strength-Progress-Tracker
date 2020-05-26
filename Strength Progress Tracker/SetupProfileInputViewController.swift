@@ -47,7 +47,10 @@ class SetupProfileInputViewController: UIViewController, UIPickerViewDelegate, U
         
         // this one is specifically so that you can tap anywhere to hide the picker
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(sender:)))
+        let swipe = UISwipeGestureRecognizer(target: self, action: #selector(self.handleTap(sender:)))
+        swipe.direction = UISwipeGestureRecognizer.Direction.down
         self.view.addGestureRecognizer(tap)
+        self.view.addGestureRecognizer(swipe)
     }
     
     @objc func handleTap(sender: UITapGestureRecognizer) {
