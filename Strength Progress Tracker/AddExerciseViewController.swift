@@ -95,6 +95,24 @@ class AddExerciseViewController: UIViewController, UICollectionViewDataSource, U
         if (exerciseNameInput.text == "" || exerciseTypeButton.title(for: .normal) == "Exercise Type") {
             return
         }
+        
+        var index = 0
+        while (index < userExercises.count) {
+            if (userExercises[index].lowercased() == exerciseNameInput.text!.lowercased()) {
+                let alertController = UIAlertController(title: "You cannot make two exercises with the same name", message: "", preferredStyle: .alert)
+                
+                //the cancel action doing nothing
+                let cancelAction = UIAlertAction(title: "Ok", style: .cancel) { (_) in }
+                
+                alertController.addAction(cancelAction)
+                
+                //finally presenting the dialog box
+                self.present(alertController, animated: true, completion: nil)
+                return
+            }
+            index += 1
+        }
+        
         let exercise = exerciseNameInput.text!
         let category = exerciseTypeButton.title(for: .normal)!
         dbManager.addToCustomExerciseList(exercise: exercise, category: category.lowercased())

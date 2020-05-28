@@ -33,13 +33,11 @@ class RecordsViewController: UIViewController, UITableViewDelegate, UITableViewD
     override func viewDidAppear(_ animated: Bool) {
         // do most of my setup here
         self.recordsList = dbManager.getRecordsList()
-        print(self.recordsList)
-        recordsTable.reloadData()
         
         self.userExercises = UserDefaults.standard.object(forKey: "User Exercise List") as! [String]
         
         createLists()
-        print(self.view.frame.height)
+        recordsTable.reloadData()
         let numVisible = Int(ceil(self.view.frame.height / 140.0))
         var index = 0
         self.animate = []
@@ -56,6 +54,7 @@ class RecordsViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     override func viewDidDisappear(_ animated: Bool) {
         self.titleLabel.alpha = 0
+        self.recordsTable.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
     }
     
     /*
@@ -68,8 +67,6 @@ class RecordsViewController: UIViewController, UITableViewDelegate, UITableViewD
         for item in userExercises {
             exerciseList.append(item)
         }
-//        print(exerciseList)
-        exerciseList.sort(by: {$0[0] < $1[0]})
     }
     
     /*
@@ -82,7 +79,7 @@ class RecordsViewController: UIViewController, UITableViewDelegate, UITableViewD
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell : RecordTableViewCell = recordsTable.dequeueReusableCell(withIdentifier: "recordCell", for: indexPath) as! RecordTableViewCell
         
-        let exerciseName = (recordsList[indexPath.row][0] as? String)!
+        let exerciseName = (self.recordsList[indexPath.row][0] as? String)!
         cell.exerciseTitle.text = exerciseName
         let tempList = dbManager.getExercises()
         if (tempList.contains([exerciseName, "bodyweight"]) || tempList.contains([exerciseName, "weights"])) {
