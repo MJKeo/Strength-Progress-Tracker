@@ -61,16 +61,15 @@ class RecentActivityViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func updateORM() {
-        var maxORM = -1.0
+        var maxORM = 0.0
         var index = 0
         while (index < self.activity.count) {
-            var num = Double(self.activity[index][1].split(separator: " ")[0])!
+            let num = Double(self.activity[index][1].split(separator: " ")[0])!
             if (num > maxORM) {
                 maxORM = num
             }
             index += 1
         }
-        print(maxORM)
         maxORM = round(maxORM * 10) / 10.0
         dbManager.setRecord(exercise: self.exercise, value: maxORM)
     }

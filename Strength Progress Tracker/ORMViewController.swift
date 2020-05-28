@@ -208,7 +208,7 @@ class ORMViewController: UIViewController {
         CALCULATIONS AND UPDATE METHODS
      */
     @IBAction func calculateORM(_ sender: Any) {
-        
+        self.hidePicker(self)
         var mustConvertBack = false //  in case they used KG
         let exercise = self.exerciseButton.title(for: .normal)!
         if (exercise == "Select Exercise") {
@@ -267,7 +267,7 @@ class ORMViewController: UIViewController {
         }
         if (self.liftWeightButton.isEnabled == false) {
             ORM = reps
-            unit = ""
+            unit = " reps"
             ORMLabel.text = String(Int(ORM)) + unit
         } else {
             ORMLabel.text = String(ORM) + unit

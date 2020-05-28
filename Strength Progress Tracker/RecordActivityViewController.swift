@@ -9,8 +9,6 @@
 import UIKit
 
 class RecordActivityViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
-
-    @IBOutlet weak var mainView: UIView!
     
     @IBOutlet weak var exerciseView: UIView!
     @IBOutlet weak var exerciseButton: UIButton!
@@ -220,6 +218,12 @@ class RecordActivityViewController: UIViewController, UIPickerViewDelegate, UIPi
             curVal = self.exerciseButton.title(for: .normal)!
             if (curVal == "Select Exercise") {
                 curVal = exerciseNames[0]
+                if (exerciseList.firstIndex(of: [exerciseNames[0],"bodyweight"]) != nil) {
+                    let userWeight = UserDefaults.standard.object(forKey: "User Weight")
+                    self.weightButton.setTitle(userWeight as? String, for: .normal)
+                    self.weightButton.setTitleColor(UIColor.gray, for: .normal)
+                    self.weightButton.isEnabled = false
+                }
                 exerciseButton.setTitle(exerciseNames[0], for: .normal)
             }
             dataPicker.reloadAllComponents()
@@ -274,9 +278,15 @@ class RecordActivityViewController: UIViewController, UIPickerViewDelegate, UIPi
         
         let currentBest = dbManager.getRecord(exercise: exerciseButton.title(for: .normal)!)
         self.popupTopConstraint.constant = 0
+        let curGoal = dbManager.getGoal(exercise: exerciseButton.title(for: .normal)!)
         if (currentBest == -1.0) {
             dbManager.insertRecord(exercise: exerciseButton.title(for: .normal)!, value: ormNumber)
         } else if (ormNumber > currentBest) {
+            if (currentBest < curGoal && ormNumber >= curGoal) {
+                self.popupPB.text = "Congratulations! That's a new personal best AND you've reached your goal!"
+            } else {
+                self.popupPB.text = "Congratulations! That's a new personal best!"
+            }
             dbManager.setRecord(exercise: exerciseButton.title(for: .normal)!, value: ormNumber)
         } else {
             self.popupPB.alpha = 0

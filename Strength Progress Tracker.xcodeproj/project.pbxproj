@@ -16,6 +16,7 @@
 		4928F9D1244779F400633D82 /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4928F9D0244779F400633D82 /* DatabaseManager.swift */; };
 		4938D8A1244B74BC00DCA81B /* Database.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 4938D8A0244B746000DCA81B /* Database.sqlite */; };
 		4938D8A3244B8E6B00DCA81B /* RecordActivityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4938D8A2244B8E6B00DCA81B /* RecordActivityViewController.swift */; };
+		493D8A47247EEF79009E8864 /* PurposeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 493D8A46247EEF79009E8864 /* PurposeViewController.swift */; };
 		494D6AC62463304E000301AF /* BreakdownORMTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494D6AC52463304E000301AF /* BreakdownORMTableViewCell.swift */; };
 		494D6AC824633D50000301AF /* BreakdownGoalTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494D6AC724633D50000301AF /* BreakdownGoalTableViewCell.swift */; };
 		494D6ACA24633D66000301AF /* BreakdownStrengthLevelTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494D6AC924633D66000301AF /* BreakdownStrengthLevelTableViewCell.swift */; };
@@ -50,12 +51,13 @@
 		4928F9D0244779F400633D82 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
 		4938D8A0244B746000DCA81B /* Database.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = Database.sqlite; sourceTree = "<group>"; };
 		4938D8A2244B8E6B00DCA81B /* RecordActivityViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordActivityViewController.swift; sourceTree = "<group>"; };
+		493D8A46247EEF79009E8864 /* PurposeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurposeViewController.swift; sourceTree = "<group>"; };
 		494D6AC52463304E000301AF /* BreakdownORMTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakdownORMTableViewCell.swift; sourceTree = "<group>"; };
 		494D6AC724633D50000301AF /* BreakdownGoalTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakdownGoalTableViewCell.swift; sourceTree = "<group>"; };
 		494D6AC924633D66000301AF /* BreakdownStrengthLevelTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakdownStrengthLevelTableViewCell.swift; sourceTree = "<group>"; };
 		495290A824566A99005BE0D4 /* ExerciseBreakdownViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseBreakdownViewController.swift; sourceTree = "<group>"; };
 		496FDA352448BE2800E715E6 /* ORMViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ORMViewController.swift; sourceTree = "<group>"; };
-		4972BF4E2443DAA1009261B6 /* Strength Progress Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Strength Progress Tracker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4972BF4E2443DAA1009261B6 /* ORM: Strength Progress Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ORM: Strength Progress Tracker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4972BF512443DAA1009261B6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4972BF532443DAA1009261B6 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		4972BF552443DAA1009261B6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -100,7 +102,7 @@
 		4972BF4F2443DAA1009261B6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				4972BF4E2443DAA1009261B6 /* Strength Progress Tracker.app */,
+				4972BF4E2443DAA1009261B6 /* ORM: Strength Progress Tracker.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -117,6 +119,7 @@
 				4972BF5C2443DAA3009261B6 /* LaunchScreen.storyboard */,
 				4972BF5F2443DAA3009261B6 /* Info.plist */,
 				4972BF672443DBF3009261B6 /* SetupProfileViewController.swift */,
+				493D8A46247EEF79009E8864 /* PurposeViewController.swift */,
 				4972BF6B24442210009261B6 /* SetupProfileInputViewController.swift */,
 				49BA260F244A4030004B16B3 /* SetupProfileSelectExerciseViewController.swift */,
 				49BA2611244A444D004B16B3 /* ExerciseCollectionViewCell.swift */,
@@ -177,7 +180,7 @@
 			);
 			name = "Strength Progress Tracker";
 			productName = "Strength Progress Tracker";
-			productReference = 4972BF4E2443DAA1009261B6 /* Strength Progress Tracker.app */;
+			productReference = 4972BF4E2443DAA1009261B6 /* ORM: Strength Progress Tracker.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -263,6 +266,7 @@
 				49BA71EE2449197000411EA1 /* GenericPickerViewController.swift in Sources */,
 				490EF52F2474615F00724BFF /* EditExerciseViewController.swift in Sources */,
 				4972BF522443DAA1009261B6 /* AppDelegate.swift in Sources */,
+				493D8A47247EEF79009E8864 /* PurposeViewController.swift in Sources */,
 				4972BF6C24442210009261B6 /* SetupProfileInputViewController.swift in Sources */,
 				492263D424607AC4001093D7 /* RecordTableViewCell.swift in Sources */,
 				4972BF6A2443DD16009261B6 /* HomePageViewController.swift in Sources */,
@@ -436,9 +440,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "mkeohane.Strength-Progress-Tracker";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "ORM: Strength Progress Tracker";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -460,9 +464,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "mkeohane.Strength-Progress-Tracker";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "ORM: Strength Progress Tracker";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};

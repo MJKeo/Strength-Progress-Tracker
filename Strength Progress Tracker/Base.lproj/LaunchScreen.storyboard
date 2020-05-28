@@ -22,7 +22,7 @@
                                 </constraints>
                             </imageView>
                         </subviews>
-                        <color key="backgroundColor" red="0.83529411764705885" green="0.13725490196078433" blue="0.13333333333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.83137254900000002" green="0.13725490200000001" blue="0.1333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="Kad-aO-pfn" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="0e2-gi-35N"/>
                             <constraint firstItem="Kad-aO-pfn" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="1Gh-Mk-6qD"/>
@@ -37,6 +37,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Splash Screen" width="677" height="1298"/>
+        <image name="Splash Screen" width="675" height="1298"/>
     </resources>
 </document>

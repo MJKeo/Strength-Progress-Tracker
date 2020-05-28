@@ -13,6 +13,9 @@ class RecordsViewController: UIViewController, UITableViewDelegate, UITableViewD
     // table view
     @IBOutlet weak var recordsTable: UITableView!
     
+    // title
+    @IBOutlet weak var titleLabel: UILabel!
+    
     // other variables
     var recordsList: [[Any]] = []
     var exerciseList: [[String]] = []
@@ -24,6 +27,7 @@ class RecordsViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         self.recordsTable.delegate = self
         self.recordsTable.dataSource = self
+        self.titleLabel.alpha = 0
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -43,6 +47,15 @@ class RecordsViewController: UIViewController, UITableViewDelegate, UITableViewD
             animate.append(true)
             index += 1
         }
+        
+        // animate title in
+        UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseOut, animations: {
+            self.titleLabel.alpha = 1
+        }, completion: nil)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        self.titleLabel.alpha = 0
     }
     
     /*

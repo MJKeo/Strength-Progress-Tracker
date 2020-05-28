@@ -85,6 +85,11 @@ class SetupProfileSelectExerciseViewController: UIViewController, UICollectionVi
     func chooseExercise(name: String) {
         var list = [name]
         UserDefaults.standard.set([name], forKey: "User Exercise List")
+        if (self.exerciseList.firstIndex(of: [name, "bodyweight"]) != nil) {
+            dbManager.addToGoals(exercise: name, value: 5)
+        } else {
+            dbManager.addToGoals(exercise: name, value: 315)
+        }
         UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseOut, animations: {
             self.exerciseCollectionView.alpha = 0
             self.promptLabel.alpha = 0

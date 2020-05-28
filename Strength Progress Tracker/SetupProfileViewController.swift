@@ -27,9 +27,9 @@ class SetupProfileViewController: UIViewController {
     }
     
     func changeView() {
-        // change to the input view
+        // change to the purpose view
         let storyBoard : UIStoryboard = UIStoryboard(name: "Main", bundle:nil)
-        let setupViewController = storyBoard.instantiateViewController(withIdentifier: "test")
+        let setupViewController = storyBoard.instantiateViewController(withIdentifier: "purposeVC")
         self.present(setupViewController, animated:true, completion:nil)
     }
     

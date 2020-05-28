@@ -113,6 +113,7 @@ class EditExerciseViewController: UIViewController, UIPickerViewDelegate, UIPick
         }
         
         if (self.typeButton.isEnabled) {
+            print("SAVING")
             UserDefaults.standard.set(self.nameInput.text!, forKey: "Selected Exercise")
             dbManager.updateExerciseType(exercise: self.name, newType: self.typeButton.title(for: .normal)!.lowercased())
             dbManager.updateExerciseName(oldName: self.name, newName: self.nameInput.text!)
@@ -125,7 +126,6 @@ class EditExerciseViewController: UIViewController, UIPickerViewDelegate, UIPick
                 index += 1
             }
             UserDefaults.standard.set(list, forKey: "User Exercise List")
-            
         }
     }
     

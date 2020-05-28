@@ -116,6 +116,12 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         refresh()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        updateGraph()
+        refresh()
+        myTableView.reloadData()
+    }
+    
     @IBAction func goBack(_ sender: Any) {
         self.dismiss(animated: true, completion: nil)
     }
@@ -140,6 +146,10 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
             self.weightButton.setTitle(userWeight as? String, for: .normal)
             self.weightButton.setTitleColor(UIColor.gray, for: .normal)
             self.weightButton.isEnabled = false
+        } else {
+            self.weightButton.setTitle("200 lbs", for: .normal)
+            self.weightButton.setTitleColor(UIColor.black, for: .normal)
+            self.weightButton.isEnabled = true
         }
         // do goal thing
         self.goal = Int(dbManager.getGoal(exercise: self.exercise))

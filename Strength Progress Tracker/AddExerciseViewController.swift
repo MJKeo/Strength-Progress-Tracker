@@ -140,9 +140,6 @@ class AddExerciseViewController: UIViewController, UICollectionViewDataSource, U
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        print(exerciseCollectionView.numberOfSections)
-        print(exerciseCollectionView.numberOfItems(inSection: 0))
-        print("accessed")
         let cell : ExerciseCollectionViewCell = exerciseCollectionView.dequeueReusableCell(withReuseIdentifier: "exerciseCell", for: indexPath) as! ExerciseCollectionViewCell
         cell.cellName?.text = exerciseList[indexPath.row + (indexPath.section * 3)][0]
         cell.cellView.layer.borderColor = UIColor(red: (162/255.0), green: (0/255.0), blue: (34/255.0), alpha: 1).cgColor
@@ -169,12 +166,16 @@ class AddExerciseViewController: UIViewController, UICollectionViewDataSource, U
     }
     
     @IBAction func hidePicker(_ sender: Any) {
+        self.exerciseCollectionView.isUserInteractionEnabled = true
         UIView.animate(withDuration: 0.7, delay: 0, options: .curveEaseOut, animations: {
             self.pickerView.transform = CGAffineTransform(translationX: 0, y: 185)
         }, completion: nil)
     }
     
+    
+    
     @IBAction func showPicker() {
+        self.exerciseCollectionView.isUserInteractionEnabled = false
         if (exerciseTypeButton.title(for: .normal) == "Exercise Type") {
             exerciseTypeButton.setTitle(exerciseTypes[0], for: .normal)
         }
@@ -186,5 +187,16 @@ class AddExerciseViewController: UIViewController, UICollectionViewDataSource, U
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         exerciseTypeButton.setTitle(exerciseTypes[row], for: .normal)
     }
-
+    
+    /*
+        Input methods to improve user experience
+     */
+    @IBAction func startedEditing(_ sender: Any) {
+        self.exerciseCollectionView.isUserInteractionEnabled = false
+    }
+    
+    @IBAction func endEditing(_ sender: Any) {
+        self.exerciseCollectionView.isUserInteractionEnabled = true
+    }
+    
 }

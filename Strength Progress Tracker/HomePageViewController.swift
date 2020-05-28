@@ -89,6 +89,9 @@ class HomePageViewController: UIViewController, UICollectionViewDelegate, UIColl
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        // get that goal thing set up
+        self.getClosestGoal()
+        
         self.mostRecentExercise = dbManager.getMostRecentExercise()
         if (self.mostRecentExercise == "") {
             self.recentExerciseLabel.alpha = 0
@@ -122,6 +125,7 @@ class HomePageViewController: UIViewController, UICollectionViewDelegate, UIColl
         var maxDiff = 3000
         var closestGoal = ["test", 1231231231.0] as [Any]
         for set in goalList {
+            print(set)
             let exerciseName = set[0] as! String
             let best = dbManager.getRecord(exercise: exerciseName)
             let goalNum = Int(set[1] as! Double)
@@ -131,9 +135,12 @@ class HomePageViewController: UIViewController, UICollectionViewDelegate, UIColl
                 closestGoal = set
             }
         }
+        print("one")
+        print(closestGoal)
         if (closestGoal[1] as! Double == 1231231231.0) {
             self.closestGoalButton.alpha = 0
         } else {
+            self.closestGoalButton.alpha = 1
             self.closestExercise = closestGoal[0] as! String
             if (exerciseList.firstIndex(of: [self.closestExercise,"bodyweight"]) != nil) {
                 let text = closestGoal[0] as! String + " " + String(Int(closestGoal[1] as! Double)) + " reps"
@@ -340,7 +347,11 @@ class HomePageViewController: UIViewController, UICollectionViewDelegate, UIColl
             if (tempList.contains([userExerciseList[cellNumber], "bodyweight"]) || tempList.contains([userExerciseList[cellNumber], "weights"])) {
                 cell.cellImage.image = UIImage(named: userExerciseList[cellNumber])
             } else {
-                cell.cellImage.image = UIImage(named: "custom")
+                if (userExerciseList[cellNumber].uppercased() == "APE") {
+                    cell.cellImage.image = UIImage(named: "Ape")
+                } else {
+                    cell.cellImage.image = UIImage(named: "custom")
+                }
             }
             
             return cell
