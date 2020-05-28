@@ -564,6 +564,10 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         let reps = Double(repsButton.title(for: .normal)!)!
         
         // perform calculation
+        // special case
+        if (reps == 1.0) {
+            return String(weight) + " " + units
+        }
         // Formula for ORM: (100 x weight) / (48.8 + (53.8 x e^(-0.075 x reps)))
         var ORM = (100.0 * weight)
         let secondHalf = (48.8 + (53.8 * pow(M_E,-0.075 * reps)))
@@ -639,12 +643,12 @@ class ExerciseBreakdownViewController: UIViewController, UITableViewDelegate, UI
         self.repsList = []
         self.weightList = []
         
-        var index = 0
+        var index = 1
         while index < 100 {
             self.repsList.append(String(index))
             index += 1
         }
-        index = 0
+        index = 1
         while (index < 1000) {
             self.weightList.append(String(index))
             index += 1

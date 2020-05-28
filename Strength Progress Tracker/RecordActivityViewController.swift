@@ -125,7 +125,7 @@ class RecordActivityViewController: UIViewController, UIPickerViewDelegate, UIPi
         self.exerciseList = []
         self.exerciseNames = []
         
-        var index = 0
+        var index = 1
         while (index < 1000) {
             if (index < 100) {
                 repsOptions.append(String(index))
@@ -342,6 +342,10 @@ class RecordActivityViewController: UIViewController, UIPickerViewDelegate, UIPi
         let reps = Double(repsButton.title(for: .normal)!)!
         
         // perform calculation
+        // special case
+        if (reps == 1.0) {
+            return String(weight) + " " + units
+        }
         // Formula for ORM: (100 x weight) / (48.8 + (53.8 x e^(-0.075 x reps)))
         var ORM = (100.0 * weight)
         let secondHalf = (48.8 + (53.8 * pow(M_E,-0.075 * reps)))
