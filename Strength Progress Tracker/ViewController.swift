@@ -17,8 +17,6 @@ class ViewController: UIViewController {
         
         // Do any additional setup after loading the view.
         dbManager.createDatabase()
-        dbManager.addFakeData()
-//        dbManager.deleteDatabase()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -32,12 +30,6 @@ class ViewController: UIViewController {
             let setupViewController = storyBoard.instantiateViewController(withIdentifier: "tabBarController") 
             self.present(setupViewController, animated:true, completion:nil)
         }
-        
-//        dbManager.populateDatabase()
-//        dbManager.readFromDatabase()
-//        dbManager.test()
-        dbManager.readFromUserDB()
-//        dbManager.readFromCustomExercises()
     }
 
 }

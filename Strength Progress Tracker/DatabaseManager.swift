@@ -2012,36 +2012,4 @@ class DatabaseManager {
             print("updated in goals")
         }
     }
-    
-    func addFakeData() {
-        var statement: OpaquePointer?
-        var addQuery = "INSERT INTO UserActivity (exercise, time_recorded, reps, weight, orm) VALUES ('Bench Press', DATE('now','-6 days'), 5 , 200, 225)"
-        var queries = [addQuery]
-        addQuery = "INSERT INTO UserActivity (exercise, time_recorded, reps, weight, orm) VALUES ('Bench Press', DATE('now','-5 days'), 5 , 200, 235)"
-        queries.append(addQuery)
-        addQuery = "INSERT INTO UserActivity (exercise, time_recorded, reps, weight, orm) VALUES ('Bench Press', DATE('now','-4 days'), 5 , 200, 236)"
-        queries.append(addQuery)
-        addQuery = "INSERT INTO UserActivity (exercise, time_recorded, reps, weight, orm) VALUES ('Bench Press', DATE('now','-3 days'), 5 , 200, 227)"
-        queries.append(addQuery)
-        addQuery = "INSERT INTO UserActivity (exercise, time_recorded, reps, weight, orm) VALUES ('Bench Press', DATE('now','-2 days'), 5 , 200, 237)"
-        queries.append(addQuery)
-        addQuery = "INSERT INTO UserActivity (exercise, time_recorded, reps, weight, orm) VALUES ('Bench Press', DATE('now','-1 days'), 5 , 200, 242)"
-        queries.append(addQuery)
-        addQuery = "INSERT INTO UserActivity (exercise, time_recorded, reps, weight, orm) VALUES ('Bench Press', DATE('now'), 5 , 200, 250)"
-        queries.append(addQuery)
-        print(queries)
-        print(addQuery)
-         
-        for item in queries {
-            if sqlite3_prepare(userDb, item, -1, &statement, nil) != SQLITE_OK {
-                print("error binding query")
-                return
-            }
-            
-            if sqlite3_step(statement) == SQLITE_DONE {
-                print("saved user data successfully")
-            }
-        }
-        
-    }
 }
