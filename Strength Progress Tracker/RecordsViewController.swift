@@ -54,7 +54,9 @@ class RecordsViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     override func viewDidDisappear(_ animated: Bool) {
         self.titleLabel.alpha = 0
-        self.recordsTable.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+        if (self.recordsList.count != 0) { //
+            self.recordsTable.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+        }
     }
     
     /*

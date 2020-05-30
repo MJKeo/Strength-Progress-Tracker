@@ -433,6 +433,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "Strength Progress Tracker/Strength Progress Tracker.entitlements";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P2SH9TP2D3;
 				INFOPLIST_FILE = "Strength Progress Tracker/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.3;
@@ -440,7 +441,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5;
+				MARKETING_VERSION = 1.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "mkeohane.Strength-Progress-Tracker";
 				PRODUCT_NAME = "ORM: Strength Progress Tracker";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -457,6 +458,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "Strength Progress Tracker/Strength Progress Tracker.entitlements";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P2SH9TP2D3;
 				INFOPLIST_FILE = "Strength Progress Tracker/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.3;
@@ -464,7 +466,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.5;
+				MARKETING_VERSION = 1.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "mkeohane.Strength-Progress-Tracker";
 				PRODUCT_NAME = "ORM: Strength Progress Tracker";
 				SWIFT_VERSION = 5.0;
